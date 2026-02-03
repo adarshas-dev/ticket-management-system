@@ -1,0 +1,73 @@
+package com.example.ticketing.service;
+
+import com.example.ticketing.model.Role;
+import com.example.ticketing.model.Ticket;
+import com.example.ticketing.model.TicketStatus;
+import com.example.ticketing.model.User;
+import com.example.ticketing.repository.TicketRepository;
+import com.example.ticketing.repository.UserRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class TicketService {
+
+    private final TicketRepository ticketRepository;
+    private final UserRepository userRepository;
+
+    public TicketService(TicketRepository ticketRepository, UserRepository userRepository) {
+        this.ticketRepository = ticketRepository;
+        this.userRepository = userRepository;
+    }
+
+    //create ticket
+    public Ticket createTicket(Long userId, Ticket ticket){
+        User user = userRepository.findById(userId).orElseThrow(()-> new RuntimeException("User not found"));
+
+        ticket.setCreatedBy(user);
+        ticket.setStatus(TicketStatus.OPEN);
+
+        return ticketRepository.save(ticket);
+    }
+
+    //view ticket
+    public List<Ticket> getTicketsByUser(Long userId){
+        User user = userRepository.findById(userId).orElseThrow(()->new RuntimeException("User not found"));
+
+        return ticketRepository.findByCreatedBy(user);
+    }
+
+    //assign ticket to agent
+    public Ticket assignTicket(Long ticketId, Long agentId){
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(()->new RuntimeException("Ticket not found"));
+
+        User agent = userRepository.findById(agentId).orElseThrow(()->new RuntimeException("Agent not found"));
+
+        if(agent.getRole() != Role.AGENT){
+            throw new RuntimeException("User is not an agent");
+        }
+
+        ticket.setAssignedAgent(agent);
+        ticket.setStatus(TicketStatus.IN_PROGRESS);
+
+        return ticketRepository.save(ticket);
+    }
+
+    //view assigned tickets
+    public List<Ticket> getTicketsForAgent(Long agentId){
+        User agnet = userRepository.findById(agentId).orElseThrow(()->new RuntimeException("Agent not found"));
+
+        return ticketRepository.findByAssignedAgent(agnet);
+    }
+
+    //update status
+    public Ticket updateStatus(Long ticketId, TicketStatus status){
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(()->new RuntimeException("Ticket not found"));
+
+        ticket.setStatus(status);
+        return ticketRepository.save(ticket);
+    }
+
+
+}
