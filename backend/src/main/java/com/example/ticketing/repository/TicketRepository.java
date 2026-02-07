@@ -11,5 +11,6 @@ import java.util.List;
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByCreatedBy(User user);
     List<Ticket> findByAssignedAgent(User agent);
-    List<Ticket> findByStatus(TicketStatus status);
+//    List<Ticket> findByStatus(TicketStatus status);
+    long countByStatus(TicketStatus status);
 }

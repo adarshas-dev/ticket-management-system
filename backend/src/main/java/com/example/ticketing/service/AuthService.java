@@ -1,9 +1,12 @@
 package com.example.ticketing.service;
 
+import com.example.ticketing.dto.AuthResponse;
 import com.example.ticketing.dto.LoginRequest;
 import com.example.ticketing.dto.RegisterRequest;
+import com.example.ticketing.exception.BadRequestException;
 import com.example.ticketing.model.User;
 import com.example.ticketing.repository.UserRepository;
+import com.example.ticketing.security.JwtUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,15 +15,17 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtUtil = jwtUtil;
     }
 
     public User register(RegisterRequest request){
         if(userRepository.findByEmail(request.getEmail()).isPresent()){
-            throw new RuntimeException("Email already exists");
+            throw new BadRequestException("Email already exists");
         }
 
         User user = new User();
@@ -32,11 +37,12 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    public User login(LoginRequest request){
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(()-> new RuntimeException("Invalid email"));
+    public AuthResponse login(LoginRequest request){
+        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(()-> new  BadRequestException("Invalid email"));
         if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
-            throw new RuntimeException("Invalid password");
+            throw new  BadRequestException("Invalid password");
         }
-        return user;
+        String token = jwtUtil.generateToken(user.getEmail());
+        return new AuthResponse(token);
     }
 }

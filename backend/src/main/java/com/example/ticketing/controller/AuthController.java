@@ -1,5 +1,6 @@
 package com.example.ticketing.controller;
 
+import com.example.ticketing.dto.AuthResponse;
 import com.example.ticketing.dto.LoginRequest;
 import com.example.ticketing.dto.RegisterRequest;
 import com.example.ticketing.model.User;
@@ -23,7 +24,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public User login(@RequestBody LoginRequest request){
+    public AuthResponse login(@RequestBody LoginRequest request){
         return authService.login(request);
     }
 }
