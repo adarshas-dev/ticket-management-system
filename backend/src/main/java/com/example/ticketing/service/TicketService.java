@@ -10,6 +10,7 @@ import com.example.ticketing.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -27,6 +28,7 @@ public class TicketService {
     public Ticket createTicket(Ticket ticket){
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        ticket.setCreatedAt(LocalDateTime.now());
         ticket.setCreatedBy(user);
         ticket.setStatus(TicketStatus.OPEN);
 

@@ -5,22 +5,14 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminDashboard from "./pages/AdminDashboard";
 import AgentDashboard from "./pages/AgentDashboard";
 import UserDashboard from "./pages/UserDashboard";
-import { getUserRole } from "./utils/jwt";
+import { useAuth } from "./auth/AuthContext";
 
 function App() {
-  // useEffect(() => {
-  //   api
-  //     .get("/dashboard/stats")
-  //     .then((res) => console.log("Backend connected: ", res.data))
-  //     .catch((err) => console.log("Error: ", err.response?.status));
-  // }, []);
-
-  const role = getUserRole();
+  const {role} = useAuth();
 
   return (
     <>
       <div>
-        <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route
@@ -30,12 +22,11 @@ function App() {
                   {role === "ADMIN" && <AdminDashboard />}
                   {role === "AGENT" && <AgentDashboard />}
                   {role === "USER" && <UserDashboard />}
-                  {!role && <Navigate to="/login" />}
+                  {!role && <Navigate to="/login" replace/>}
                 </ProtectedRoute>
               }
             />
           </Routes>
-        </BrowserRouter>
       </div>
     </>
   );
