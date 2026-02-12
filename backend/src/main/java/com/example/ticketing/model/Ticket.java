@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "tickets")
@@ -39,4 +40,7 @@ public class Ticket {
     @ManyToOne
     @JoinColumn(name = "agent_id")
     private User assignedAgent;
+
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL)
+    private List<Comment> comments;
 }

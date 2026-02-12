@@ -1,5 +1,6 @@
 package com.example.ticketing.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +25,7 @@ public class Comment {
     private String message;
     private LocalDateTime createdAt = LocalDateTime.now();
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "ticket_id")
     private Ticket ticket;

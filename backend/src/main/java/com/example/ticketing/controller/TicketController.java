@@ -36,6 +36,11 @@ public class TicketController {
         return ticketService.getTicketsForLoggedInUser();
     }
 
+    @GetMapping("/{id}")
+    public Ticket getTicketById(@PathVariable Long id){
+        return ticketService.getTicketById(id);
+    }
+
     //assign ticket
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{ticketId}/assign/{agentId}")

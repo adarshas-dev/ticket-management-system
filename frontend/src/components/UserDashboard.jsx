@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { useNavigate } from "react-router-dom";
+import { Table } from "react-bootstrap";
 
 function UserDashboard() {
   const [tickets, setTickets] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     api
@@ -35,7 +38,7 @@ function UserDashboard() {
         {tickets.length === 0 ? (
           <p>No tickets found</p>
         ) : (
-          <table border="1" cellPadding="8">
+          <Table responsive striped hover bordered>
             <thead>
               <tr>
                 <th>ID</th>
@@ -46,7 +49,7 @@ function UserDashboard() {
             </thead>
             <tbody>
               {tickets.map((t) => (
-                <tr key={t.id}>
+                <tr key={t.id} onClick={() => navigate(`/tickets/${t.id}`)} style={{cursor: "pointer"}}>
                   <td>{t.id}</td>
                   <td>{t.title}</td>
                   <td>{t.status}</td>
@@ -54,7 +57,7 @@ function UserDashboard() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </Table>
         )}
       </div>
     </>
