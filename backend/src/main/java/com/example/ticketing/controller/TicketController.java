@@ -2,10 +2,13 @@ package com.example.ticketing.controller;
 
 import com.example.ticketing.model.Ticket;
 import com.example.ticketing.model.TicketStatus;
+import com.example.ticketing.model.User;
 import com.example.ticketing.service.TicketService;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -42,9 +45,15 @@ public class TicketController {
 
     //view assigned ticket
     @PreAuthorize("hasRole('AGENT')")
-    @GetMapping("/agent/{agentId}")
-    public List<Ticket> getAgentTickets(@PathVariable Long agentId){
-        return ticketService.getTicketsForAgent(agentId);
+    @GetMapping("/assigned")
+    public List<Ticket> getAgentTickets(Authentication authentication) {
+
+        User user = (User) authentication.getPrincipal();
+
+//        System.out.println("Controller HIT");
+//        System.out.println("Email = " + user.getEmail());
+
+        return ticketService.getTicketsForAgent(user.getEmail());
     }
 
     //update status

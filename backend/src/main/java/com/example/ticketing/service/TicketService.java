@@ -59,8 +59,8 @@ public class TicketService {
     }
 
     //view assigned tickets
-    public List<Ticket> getTicketsForAgent(Long agentId){
-        User agnet = userRepository.findById(agentId).orElseThrow(()->new ResourceNotFoundException("Agent not found"));
+    public List<Ticket> getTicketsForAgent(String email){
+        User agnet = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("Agent not found"));
 
         return ticketRepository.findByAssignedAgent(agnet);
     }
