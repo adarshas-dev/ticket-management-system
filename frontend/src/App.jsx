@@ -7,6 +7,11 @@ import AgentDashboard from "./components/AgentDashboard";
 import UserDashboard from "./components/UserDashboard";
 import { useAuth } from "./auth/AuthContext";
 import TicketDetails from "./components/TicketDetails";
+import CreateTicket from "./components/CreateTicket";
+import Navbar from "./components/Navbar";
+import Register from "./components/Register";
+import TicketListByStatus from "./components/TicketListByStatus";
+import NewAdminAgent from "./components/NewAdminAgent";
 
 function App() {
   const { role } = useAuth();
@@ -14,8 +19,10 @@ function App() {
   return (
     <>
       <div>
+        {role && <Navbar />}
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route
             path="/"
             element={
@@ -32,6 +39,30 @@ function App() {
             element={
               <ProtectedRoute>
                 <TicketDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/tickets/:status"
+            element={<TicketListByStatus />}
+          />
+          <Route
+            path="/agent/tickets/:status"
+            element={<TicketListByStatus />}
+          />
+          <Route
+            path="/create"
+            element={
+              <ProtectedRoute>
+                <CreateTicket />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/create-user"
+            element={
+              <ProtectedRoute>
+                <NewAdminAgent/>
               </ProtectedRoute>
             }
           />

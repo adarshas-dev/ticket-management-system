@@ -1,10 +1,14 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { Table } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import DashboardLayout from "../layout/DashboardLayout";
 
 function AgentDashboard() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     api
@@ -25,14 +29,14 @@ function AgentDashboard() {
   if (loading) return <p>Loading assigned tickets...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   return (
-    <>
-      <div>
+      <DashboardLayout>
+        <div>
         <h2>Agent Dashboard</h2>
 
         {tickets.length === 0 ? (
           <p>No assigned tickets</p>
         ) : (
-          <table>
+          <Table responsive striped hover>
             <thead>
               <tr>
                 <th>ID</th>
@@ -43,7 +47,7 @@ function AgentDashboard() {
             </thead>
             <tbody>
               {tickets.map((t) => (
-                <tr key={t.id}>
+                <tr key={t.id} onClick={() => navigate(`/tickets/${t.id}`)} style={{cursor: "pointer"}}>
                   <td>{t.id}</td>
                   <td>{t.title}</td>
                   <td>{t.status}</td>
@@ -51,10 +55,10 @@ function AgentDashboard() {
                 </tr>
               ))}
             </tbody>
-          </table>
+          </Table>
         )}
       </div>
-    </>
+      </DashboardLayout>
   );
 }
 export default AgentDashboard;

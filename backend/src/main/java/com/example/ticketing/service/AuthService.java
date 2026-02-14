@@ -4,6 +4,7 @@ import com.example.ticketing.dto.AuthResponse;
 import com.example.ticketing.dto.LoginRequest;
 import com.example.ticketing.dto.RegisterRequest;
 import com.example.ticketing.exception.BadRequestException;
+import com.example.ticketing.model.Role;
 import com.example.ticketing.model.User;
 import com.example.ticketing.repository.UserRepository;
 import com.example.ticketing.security.JwtUtil;
@@ -32,7 +33,7 @@ public class AuthService {
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole(request.getRole());
+        user.setRole(Role.USER);
 
         return userRepository.save(user);
     }

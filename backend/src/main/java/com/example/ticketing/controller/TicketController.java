@@ -68,5 +68,24 @@ public class TicketController {
         return ticketService.updateStatus(ticketId, status);
     }
 
+    //get the tickets according to the status
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/status/{status}")
+    public List<Ticket> getTicketsByStatus(@PathVariable TicketStatus status) {
+        return ticketService.getTicketsByStatus(status);
+    }
+
+    //gets assigned tickets for the agent in the sidebar
+    @PreAuthorize("hasRole('AGENT')")
+    @GetMapping("/assigned/status/{status}")
+    public List<Ticket> getAssignedTicketsByStatus(
+            @PathVariable TicketStatus status,
+            Authentication authentication
+    ) {
+        User agent = (User) authentication.getPrincipal();
+        return ticketService.getAssignedTicketsByStatus(agent.getEmail(), status);
+    }
+
+
 
 }

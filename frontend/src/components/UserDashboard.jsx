@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import { Table } from "react-bootstrap";
+import { Button, Table } from "react-bootstrap";
+import DashboardLayout from "../layout/DashboardLayout";
 
 function UserDashboard() {
   const [tickets, setTickets] = useState([]);
@@ -31,28 +32,34 @@ function UserDashboard() {
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   console.log("TICKETS DATA:", tickets);
   return (
-    <>
-      <div>
+    <DashboardLayout>
+      <div >
         <h2>My Tickets</h2>
 
         {tickets.length === 0 ? (
           <p>No tickets found</p>
         ) : (
-          <Table responsive striped hover bordered>
+          <Table responsive striped hover >
             <thead>
               <tr>
                 <th>ID</th>
                 <th>Title</th>
                 <th>Status</th>
+                <th>Priority</th>
                 <th>Created At</th>
               </tr>
             </thead>
             <tbody>
               {tickets.map((t) => (
-                <tr key={t.id} onClick={() => navigate(`/tickets/${t.id}`)} style={{cursor: "pointer"}}>
+                <tr
+                  key={t.id}
+                  onClick={() => navigate(`/tickets/${t.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
                   <td>{t.id}</td>
                   <td>{t.title}</td>
                   <td>{t.status}</td>
+                  <td>{t.priority}</td>
                   <td>{new Date(t.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
@@ -60,7 +67,7 @@ function UserDashboard() {
           </Table>
         )}
       </div>
-    </>
+    </DashboardLayout>
   );
 }
 export default UserDashboard;

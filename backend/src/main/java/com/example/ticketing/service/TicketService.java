@@ -1,10 +1,7 @@
 package com.example.ticketing.service;
 
 import com.example.ticketing.exception.ResourceNotFoundException;
-import com.example.ticketing.model.Role;
-import com.example.ticketing.model.Ticket;
-import com.example.ticketing.model.TicketStatus;
-import com.example.ticketing.model.User;
+import com.example.ticketing.model.*;
 import com.example.ticketing.repository.TicketRepository;
 import com.example.ticketing.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,6 +28,9 @@ public class TicketService {
         ticket.setCreatedAt(LocalDateTime.now());
         ticket.setCreatedBy(user);
         ticket.setStatus(TicketStatus.OPEN);
+        if (ticket.getPriority() == null) {
+            ticket.setPriority(Priority.MEDIUM);
+        }
 
         return ticketRepository.save(ticket);
     }
@@ -76,5 +76,17 @@ public class TicketService {
 
     public Ticket getTicketById(Long id) {
         return ticketRepository.findById(id).orElseThrow(()-> new RuntimeException("Ticket not found"));
+    }
+
+    public List<Ticket> getTicketsByStatus(TicketStatus status) {
+        return ticketRepository.findByStatus(status);
+    }
+
+    public List<Ticket> getAssignedTicketsByStatus(String email, TicketStatus status) {
+
+        User agent = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Agent not found"));
+
+        return ticketRepository.findByAssignedAgentAndStatus(agent, status);
     }
 }
