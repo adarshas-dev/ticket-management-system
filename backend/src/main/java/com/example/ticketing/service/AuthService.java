@@ -43,7 +43,7 @@ public class AuthService {
         if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
             throw new  BadRequestException("Invalid password");
         }
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name());
+        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name(), user.getName());
         return new AuthResponse(token);
     }
 }

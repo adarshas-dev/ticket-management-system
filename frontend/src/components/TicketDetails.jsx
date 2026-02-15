@@ -210,7 +210,7 @@ function TicketDetails() {
 
 
           {/* Add Comment */}
-          {(role === "AGENT" || role === "USER") && (
+          {(role === "AGENT" || role === "USER") && ticket.status !== "CLOSED" && (
             <div style={{ marginTop: "20px" }}>
             <textarea
               value={comment}

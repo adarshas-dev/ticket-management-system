@@ -4,6 +4,8 @@ import { useAuth } from "../auth/AuthContext";
 import api from "../api/axios";
 import DashboardLayout from "../layout/DashboardLayout";
 import { Table } from "react-bootstrap";
+import StatusBadge from "./StatusBadge";
+import PriorityBadge from "./PriorityBadge";
 
 function TicketListByStatus() {
   const { status } = useParams();
@@ -22,6 +24,8 @@ function TicketListByStatus() {
       endpoint = `/tickets/status/${status}`;
     } else if (role === "AGENT") {
       endpoint = `/tickets/assigned/status/${status}`;
+    }else{
+      return;
     }
 
     api.get(endpoint)
@@ -56,18 +60,24 @@ function TicketListByStatus() {
                 <th>ID</th>
                 <th>Title</th>
                 <th>Status</th>
+                <th>Priority</th>
               </tr>
             </thead>
             <tbody>
-              {tickets.map(t => (
+              {tickets.map((t, index) => (
                 <tr
                   key={t.id}
                   onClick={() => navigate(`/tickets/${t.id}`)}
                   style={{ cursor: "pointer" }}
                 >
-                  <td>{t.id}</td>
+                  <td>{index + 1}</td>
                   <td>{t.title}</td>
-                  <td>{t.status}</td>
+                  <td>
+                    <StatusBadge status={t.status} />
+                  </td>
+                  <td>
+                    <PriorityBadge priority={t.priority} />
+                  </td>
                 </tr>
               ))}
             </tbody>

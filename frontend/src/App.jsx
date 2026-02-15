@@ -12,6 +12,8 @@ import Navbar from "./components/Navbar";
 import Register from "./components/Register";
 import TicketListByStatus from "./components/TicketListByStatus";
 import NewAdminAgent from "./components/NewAdminAgent";
+import ManageUsers from "./components/ManageUser";
+import Profile from "./components/Profile";
 
 function App() {
   const { role } = useAuth();
@@ -62,10 +64,12 @@ function App() {
             path="/create-user"
             element={
               <ProtectedRoute>
-                <NewAdminAgent/>
+                <NewAdminAgent />
               </ProtectedRoute>
             }
           />
+          <Route path="/admin/users" element={<ManageUsers />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </div>
     </>

@@ -2,11 +2,13 @@ package com.example.ticketing.controller;
 
 import com.example.ticketing.dto.AgentDto;
 import com.example.ticketing.dto.NewAdminAgentDto;
+import com.example.ticketing.dto.UserResponseDto;
 import com.example.ticketing.model.Role;
 import com.example.ticketing.model.User;
 import com.example.ticketing.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -62,4 +64,44 @@ public class AdminController {
 
             return userRepository.save(user);
         }
+
+        //admin manages user(admin and agent)
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/users")
+    public List<UserResponseDto> getAllAdminsAndAgents() {
+
+        return userRepository.findByRoleIn(List.of(Role.ADMIN, Role.AGENT))
+                .stream()
+                .map(user -> new UserResponseDto(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getRole()
+                ))
+                .toList();
+    }
+
+    //admin can delete user(admin/agent)
+    @PreAuthorize("hasRole('ADMIN')")
+    @DeleteMapping("/users/{id}")
+    public void deleteUser(@PathVariable Long id,
+                           Authentication authentication) {
+
+        User currentAdmin = (User) authentication.getPrincipal();
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getId().equals(currentAdmin.getId())) {
+            throw new RuntimeException("You cannot delete yourself");
+        }
+
+        if (user.getRole() == Role.USER) {
+            throw new RuntimeException("Cannot delete normal users here");
+        }
+
+        userRepository.delete(user);
+    }
+
+
 }

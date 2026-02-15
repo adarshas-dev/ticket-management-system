@@ -3,6 +3,8 @@ import api from "../api/axios";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../layout/DashboardLayout";
+import StatusBadge from "./StatusBadge";
+import PriorityBadge from "./PriorityBadge";
 
 function AgentDashboard() {
   const [tickets, setTickets] = useState([]);
@@ -31,7 +33,7 @@ function AgentDashboard() {
   return (
       <DashboardLayout>
         <div>
-        <h2>Agent Dashboard</h2>
+        {/* <h2>Agent Dashboard</h2> */}
 
         {tickets.length === 0 ? (
           <p>No assigned tickets</p>
@@ -42,15 +44,21 @@ function AgentDashboard() {
                 <th>ID</th>
                 <th>Title</th>
                 <th>Status</th>
+                <th>Priority</th>
                 <th>Created At</th>
               </tr>
             </thead>
             <tbody>
-              {tickets.map((t) => (
+              {tickets.map((t, index) => (
                 <tr key={t.id} onClick={() => navigate(`/tickets/${t.id}`)} style={{cursor: "pointer"}}>
-                  <td>{t.id}</td>
+                  <td>{index + 1}</td>
                   <td>{t.title}</td>
-                  <td>{t.status}</td>
+                  <td>
+                    <StatusBadge status={t.status} />
+                  </td>
+                  <td>
+                    <PriorityBadge priority={t.priority} />
+                  </td>
                   <td>{new Date(t.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}

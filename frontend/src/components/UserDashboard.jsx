@@ -3,6 +3,8 @@ import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import { Button, Table } from "react-bootstrap";
 import DashboardLayout from "../layout/DashboardLayout";
+import StatusBadge from "./StatusBadge";
+import PriorityBadge from "./PriorityBadge";
 
 function UserDashboard() {
   const [tickets, setTickets] = useState([]);
@@ -33,13 +35,13 @@ function UserDashboard() {
   console.log("TICKETS DATA:", tickets);
   return (
     <DashboardLayout>
-      <div >
+      <div>
         <h2>My Tickets</h2>
 
         {tickets.length === 0 ? (
           <p>No tickets found</p>
         ) : (
-          <Table responsive striped hover >
+          <Table responsive striped hover>
             <thead>
               <tr>
                 <th>ID</th>
@@ -58,8 +60,12 @@ function UserDashboard() {
                 >
                   <td>{t.id}</td>
                   <td>{t.title}</td>
-                  <td>{t.status}</td>
-                  <td>{t.priority}</td>
+                  <td>
+                    <StatusBadge status={t.status} />
+                  </td>
+                  <td>
+                    <PriorityBadge priority={t.priority} />
+                  </td>
                   <td>{new Date(t.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
