@@ -70,7 +70,7 @@ UI enhancements and additional improvements ongoing.
 ![Ticket Details](screenshots/ticket-details.png)
 
 ### Manage Users
-![Manage Users](screenshots/admin-manage-users.png)
+![Manage Users](screenshots/admin-manage-user.png)
 
 ### Create Ticket
 ![Create Ticket](screenshots/user-create-ticket.png)
