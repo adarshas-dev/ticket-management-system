@@ -7,6 +7,7 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { loginSuccess } = useAuth();
 
@@ -28,10 +29,9 @@ function Login() {
         <h4 className="text-center mb-4">Hey, Welcome Back</h4>
 
         <form onSubmit={handleSubmit}>
-          {error && (
-            <div className="alert alert-danger py-2">{error}</div>
-          )}
+          {error && <div className="alert alert-danger py-2">{error}</div>}
 
+          {/* email */}
           <div className="mb-3">
             <label className="form-label">Email</label>
             <input
@@ -43,15 +43,25 @@ function Login() {
             />
           </div>
 
+          {/* password */}
           <div className="mb-3">
             <label className="form-label">Password</label>
-            <input
-              type="password"
-              className="form-control"
-              placeholder="Enter your password"
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <div className="input-group">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="form-control"
+                placeholder="Enter your password"
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                className="btn border"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ?  <i className="fa-regular fa-eye-slash"></i> : <i className="fa-solid fa-eye"></i>}
+              </button>
+            </div>
           </div>
 
           <button type="submit" className="btn btn-primary w-100 mt-2">
