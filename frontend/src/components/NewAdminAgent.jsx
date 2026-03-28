@@ -115,7 +115,7 @@ function NewAdminAgent() {
                 Cancel
               </Button>
 
-              <Button type="submit" variant="primary">
+              <Button type="submit" className="btn-pink">
                 Create User
               </Button>
             </div>

@@ -31,4 +31,6 @@ public class User {
     private Role role;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    private boolean active = true;
 }

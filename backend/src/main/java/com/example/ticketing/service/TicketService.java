@@ -1,5 +1,6 @@
 package com.example.ticketing.service;
 
+import com.example.ticketing.dto.UserStatsDto;
 import com.example.ticketing.exception.ResourceNotFoundException;
 import com.example.ticketing.model.*;
 import com.example.ticketing.repository.TicketRepository;
@@ -88,5 +89,48 @@ public class TicketService {
                 .orElseThrow(() -> new RuntimeException("Agent not found"));
 
         return ticketRepository.findByAssignedAgentAndStatus(agent, status);
+    }
+
+    public UserStatsDto getUserStats(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return new UserStatsDto(
+                ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.OPEN),
+                ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.IN_PROGRESS),
+                ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.RESOLVED),
+                ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.CLOSED)
+        );
+    }
+
+    public void autoAssignTickets() {
+
+        //get all agents
+//        List<User> agents = userRepository.findByRole(Role.AGENT);
+        List<User> agents = userRepository.findByRoleAndActiveTrue(Role.AGENT);
+
+        if (agents.isEmpty()) {
+            throw new RuntimeException("No agents available");
+        }
+
+        //get all unassigned tickets
+        List<Ticket> tickets = ticketRepository.findByAssignedAgentIsNullAndStatus(TicketStatus.OPEN);
+
+        //sort based on priority
+        tickets.sort((t1, t2) -> t2.getPriority().compareTo(t1.getPriority()));
+
+        //using round robin
+        int index = 0;
+
+        for (Ticket ticket : tickets) {
+            User agent = agents.get(index % agents.size());
+
+            ticket.setAssignedAgent(agent);
+            ticket.setStatus(TicketStatus.IN_PROGRESS);
+
+            index++;
+        }
+
+        ticketRepository.saveAll(tickets);
     }
 }

@@ -24,34 +24,58 @@ function TicketListByStatus() {
       endpoint = `/tickets/status/${status}`;
     } else if (role === "AGENT") {
       endpoint = `/tickets/assigned/status/${status}`;
-    }else{
+    } else {
       return;
     }
 
-    api.get(endpoint)
-      .then(res => setTickets(res.data))
-      .catch(err => {
+    api
+      .get(endpoint)
+      .then((res) => setTickets(res.data))
+      .catch((err) => {
         setError(
           err.response?.status === 403
             ? "Not authorized"
-            : "Failed to load tickets"
+            : "Failed to load tickets",
         );
       })
       .finally(() => setLoading(false));
-
   }, [status, role]);
 
   return (
     <DashboardLayout>
       <div>
-        <h2>{status} Tickets</h2>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <h2 style={{ margin: 0 }}>{status} Tickets</h2>
+
+          {role === "ADMIN" && status === "OPEN" && (
+            <button
+              className="btn btn-primary fw-bold shadow-sm"
+              onClick={() => {
+                api
+                  .put("/admin/tickets/auto-assign")
+                  .then(() => {
+                    alert("Tickets assigned successfully");
+                    window.location.reload();
+                  })
+                  .catch(() => alert("Failed to assign tickets"));
+              }}
+            >
+              ⚡ Auto Assign Tickets
+            </button>
+          )}
+        </div>
 
         {loading && <p>Loading tickets...</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
 
-        {!loading && !error && tickets.length === 0 && (
-          <p>No tickets found</p>
-        )}
+        {!loading && !error && tickets.length === 0 && <p>No tickets found</p>}
 
         {!loading && !error && tickets.length > 0 && (
           <Table responsive striped hover>

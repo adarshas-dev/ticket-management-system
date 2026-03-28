@@ -1,7 +1,9 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
+import { useState } from "react";
 
 function Navbar() {
+  const [isHover, setIsHover] = useState(false);
   const { role, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -10,10 +12,21 @@ function Navbar() {
     navigate("/login", { replace: true });
   };
 
-  const navLinkStyle = ({ isActive }) => ({
-    textDecoration: isActive ? "underline" : "none",
-    textUnderlineOffset: "6px",
-  });
+  const navLinkStyle = ({ isActive }) =>
+    isActive
+      ? {
+          background: "rgba(255, 255, 255, 0.18)",
+          backdropFilter: "blur(10px)",
+          WebkitBackdropFilter: "blur(10px)",
+          boxShadow: "0 4px 15px rgba(0,0,0,0.15)",
+          border: "1px solid rgba(255,255,255,0.25)",
+        }
+      : {};
+
+  // const logoutLogo = ({isActive}) =>
+  //   isActive?{
+  //     <i></i>
+  //   }:{};
 
   return (
     <div
@@ -51,17 +64,9 @@ function Navbar() {
             <NavLink
               to="/"
               style={navLinkStyle}
-              className="text-white fw-semibold"
+              className="text-white fw-semibold nav-item-custom"
             >
               My Tickets
-            </NavLink>
-
-            <NavLink
-              to="/create"
-              style={navLinkStyle}
-              className="text-white fw-semibold"
-            >
-              Create Ticket
             </NavLink>
           </>
         )}
@@ -70,7 +75,7 @@ function Navbar() {
           <NavLink
             to="/"
             style={navLinkStyle}
-            className="text-white fw-semibold"
+            className="text-white fw-semibold nav-item-custom"
           >
             Assigned Tickets
           </NavLink>
@@ -80,7 +85,7 @@ function Navbar() {
           <NavLink
             to="/"
             style={navLinkStyle}
-            className="text-white fw-semibold"
+            className="text-white fw-semibold nav-item-custom"
           >
             Dashboard
           </NavLink>
@@ -89,8 +94,14 @@ function Navbar() {
         <button
           onClick={handleLogout}
           className="btn btn-sm btn-warning fw-semibold"
+          onMouseEnter={() => setIsHover(true)}
+          onMouseLeave={() => setIsHover(false)}
         >
-          <i className="fa-solid fa-unlock-keyhole me-2"></i>
+          <i
+            className={`me-2 fa-solid ${
+              isHover ? "fa-unlock" : "fa-lock"
+            }`}
+          ></i>
           Logout
         </button>
       </div>

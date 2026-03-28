@@ -26,12 +26,14 @@ public class DashboardController {
         this.dashboardService = dashboardService;
     }
 
+    //admin stats
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/stats")
     public DashboardStatsResponse getStats(){
         return dashboardService.getStats();
     }
 
+    //agent stats
     @PreAuthorize("hasRole('AGENT')")
     @GetMapping("/agent-stats")
     public Map<String, Long> getAgentStats(Authentication authentication) {

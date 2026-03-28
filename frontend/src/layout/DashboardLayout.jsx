@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { useEffect, useState } from "react";
 import api from "../api/axios";
+import { Button } from "react-bootstrap";
 
 function DashboardLayout({ children }) {
   const [stats, setStats] = useState(null);
@@ -86,9 +87,15 @@ function DashboardLayout({ children }) {
                 collapsed={collapsed}
               />
               <SidebarLink
-                to="/admin/users"
+                to="/admin/users/active"
                 icon="fa-users"
                 label="Manage Users"
+                collapsed={collapsed}
+              />
+              <SidebarLink
+                to="/admin/users/inactive"
+                icon="fa-users-slash"
+                label="Inactive Users"
                 collapsed={collapsed}
               />
             </>
@@ -167,6 +174,7 @@ function DashboardLayout({ children }) {
             borderBottom: "1px solid #ddd",
           }}
         >
+          <Button className="me-2 btn-pink" onClick={() => navigate(-1)}><i className="fa-solid fa-left-long"></i></Button>
           {role === "ADMIN" && <h5 style={{ margin: 0 }}>Admin Dashboard</h5>}
           {role === "AGENT" && <h5 style={{ margin: 0 }}>Agent Dashboard</h5>}
           {role === "USER" && <h5 style={{ margin: 0 }}>User Dashboard</h5>}

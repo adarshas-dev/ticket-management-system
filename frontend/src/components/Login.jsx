@@ -19,12 +19,15 @@ function Login() {
       loginSuccess();
       navigate("/", { replace: true });
     } catch (err) {
-      setError("Invalid credentials");
+      const message =
+        err.response?.data?.message || err.response?.data || "Login failed";
+
+      setError(message);
     }
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center vh-100">
+    <div className="d-flex justify-content-center align-items-center vh-100 login-bg">
       <div className="card shadow p-4" style={{ width: "22rem" }}>
         <h4 className="text-center mb-4">Hey, Welcome Back</h4>
 
@@ -59,12 +62,16 @@ function Login() {
                 className="btn border"
                 onClick={() => setShowPassword(!showPassword)}
               >
-                {showPassword ?  <i className="fa-regular fa-eye-slash"></i> : <i className="fa-solid fa-eye"></i>}
+                {showPassword ? (
+                  <i className="fa-regular fa-eye-slash"></i>
+                ) : (
+                  <i className="fa-solid fa-eye"></i>
+                )}
               </button>
             </div>
           </div>
 
-          <button type="submit" className="btn btn-primary w-100 mt-2">
+          <button type="submit" className="btn btn-pink w-100 mt-2">
             Login
           </button>
         </form>

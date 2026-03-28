@@ -33,8 +33,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGeneric(Exception ex) {
+        ex.printStackTrace();
         return new ResponseEntity<>(
-                new ApiError(500, "Internal server error"),
+//                new ApiError(500, "Internal server error"),
+                new ApiError(500, ex.getMessage()),
                 HttpStatus.INTERNAL_SERVER_ERROR
         );
     }

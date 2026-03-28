@@ -4,59 +4,40 @@ import DashboardLayout from "../layout/DashboardLayout";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
-function ManageUsers() {
+function InactiveUser() {
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetchActiveUsers();
+    fetchInactiveUsers();
   }, []);
 
-  const fetchActiveUsers = () => {
-    api.get("/admin/users/active")
+  const fetchInactiveUsers = () => {
+    api.get("/admin/users/inactive")
       .then((res) => setUsers(res.data));
   };
 
-  const toggleStatus = async (e, user) => {
-    e.stopPropagation(); // ✅ prevent row click
+  const activateUser = async (e, id) => {
+    e.stopPropagation(); // ✅ prevent row click navigation
 
     try {
-      let autoAssign = false;
+      await api.put(`/admin/users/${id}/toggle-status`);
 
-      // ✅ only ask confirmation for active AGENT
-      if (user.active && user.role === "AGENT") {
-        const confirmAction = window.confirm(
-          "This agent may have active tickets.\n\nAuto-assign them to other agents?"
-        );
+      alert("User activated successfully");
 
-        if (!confirmAction) {
-          return;
-        }
-
-        autoAssign = true;
-      }
-
-      await api.put(`/admin/users/${user.id}/toggle-status`, {
-        autoAssign,
-      });
-
-      alert(`${user.name} suspended successfully`);
-
-      // ✅ remove from active table immediately
-      setUsers(users.filter((u) => u.id !== user.id));
+      // ✅ remove from inactive table immediately
+      setUsers(users.filter((u) => u.id !== id));
 
     } catch (err) {
-      const message =
-        err.response?.data?.message ||
-        "Something went wrong";
-
-      alert(message);
+      alert(
+        err.response?.data?.message || "Failed to activate user"
+      );
     }
   };
 
   return (
     <DashboardLayout>
-      <h2>Manage Users</h2>
+      <h2>Inactive Users</h2>
 
       <Table responsive striped hover>
         <thead>
@@ -81,10 +62,10 @@ function ManageUsers() {
 
               <td>
                 <button
-                  className="btn btn-warning"
-                  onClick={(e) => toggleStatus(e, user)}
+                  className="btn btn-success"
+                  onClick={(e) => activateUser(e, user.id)}
                 >
-                  Suspend
+                  Activate
                 </button>
               </td>
             </tr>
@@ -95,4 +76,4 @@ function ManageUsers() {
   );
 }
 
-export default ManageUsers;
+export default InactiveUser;

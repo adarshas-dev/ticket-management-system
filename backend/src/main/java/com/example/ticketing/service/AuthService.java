@@ -39,11 +39,24 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request){
-        User user = userRepository.findByEmail(request.getEmail()).orElseThrow(()-> new  BadRequestException("Invalid email"));
-        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())){
-            throw new  BadRequestException("Invalid password");
+
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new BadRequestException("Invalid email"));
+
+        if (!user.isActive()) {
+            throw new BadRequestException("Your account is suspended. Contact admin.");
         }
-        String token = jwtUtil.generateToken(user.getEmail(), user.getRole().name(), user.getName());
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new BadRequestException("Invalid password");
+        }
+
+        String token = jwtUtil.generateToken(
+                user.getEmail(),
+                user.getRole().name(),
+                user.getName()
+        );
+
         return new AuthResponse(token);
     }
 }

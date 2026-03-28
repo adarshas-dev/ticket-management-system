@@ -14,6 +14,8 @@ import TicketListByStatus from "./components/TicketListByStatus";
 import NewAdminAgent from "./components/NewAdminAgent";
 import ManageUsers from "./components/ManageUser";
 import Profile from "./components/Profile";
+import UserDetails from "./components/UserDetails";
+import InactiveUsers from "./components/InactiveUser";
 
 function App() {
   const { role } = useAuth();
@@ -68,8 +70,17 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/admin/users" element={<ManageUsers />} />
+          <Route path="/admin/users/active" element={<ManageUsers />} />
+          <Route path="/admin/users/inactive" element={<InactiveUsers/>} />
           <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/users/:id"
+            element={
+              <ProtectedRoute>
+                <UserDetails />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </div>
     </>

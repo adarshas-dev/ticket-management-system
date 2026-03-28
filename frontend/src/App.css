@@ -1,23 +1,31 @@
-
 .nav-item-custom {
-  transition: all 0.2s ease;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  padding: 5px 16px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  display: inline-block;
 }
 
 .nav-item-custom:hover {
-  opacity: 0.8;
-  text-decoration: underline;
-  text-underline-offset: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+  transform: translateY(-1px);
 }
 .custom-btn {
   padding: 6px 12px;
   border-radius: 20px;
   border: none;
-  background-color: #d1e7dd;
+  background-color: #f06363;
   transition: background-color 0.2s ease;
 }
 
 .custom-btn:hover {
-  background-color: #f8d7da;
+  background-color: #f8bbc0;
 }
 
 .sidebar-link {
@@ -30,11 +38,32 @@
 }
 
 .sidebar-section {
-  background-color: rgba(255,255,255,0.15);
+  background-color: rgba(255, 255, 255, 0.15);
   transition: all 0.2s ease;
 }
 
 .sidebar-section:hover {
   background-color: rgba(255, 255, 255, 0.292);
   transform: translateX(4px);
+}
+
+
+.login-bg {
+  /* background-image: url("assets/images/bg-light.jpeg"); */
+  background-image: url("assets/images/bg-dark.jpeg");
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;   
+  width: 100%;
+  height: 100vh;            
+  margin: 0;
+}
+
+.btn-pink{
+  background-color: #c90c74;
+  border: #c90c74;
+}
+.btn-pink:hover{
+  background-color: #de4198;
+  /* border: #c32b7f; */
 }

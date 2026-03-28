@@ -12,12 +12,14 @@ public class UserResponseDto {
     private String name;
     private String email;
     private Role role;
+    private boolean active;
 
-    public UserResponseDto(Long id, String name, String email, Role role) {
+    public UserResponseDto(Long id, String name, String email, Role role, boolean active) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.role = role;
+        this.active = active;
     }
 
 }
