@@ -1,14 +1,17 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Form, useParams } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../auth/AuthContext";
 import DashboardLayout from "../layout/DashboardLayout";
+import { Modal } from "react-bootstrap";
 
 function TicketDetails() {
   const { id } = useParams();
   const [ticket, setTicket] = useState(null);
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState("");
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportText, setReportText] = useState("");
   const { role, user } = useAuth();
   const [agents, setAgents] = useState([]);
 
@@ -65,12 +68,33 @@ function TicketDetails() {
     }
   };
 
+  const handleReport = async () => {
+    if (!reportText.trim()) {
+      alert("Please enter report details");
+      return;
+    }
+
+    try {
+      await api.post("/reports", {
+        ticketId: ticket.id,
+        agentId: ticket.assignedAgent?.id,
+        message: reportText,
+      });
+
+      alert("Report submitted successfully");
+
+      setReportText("");
+      setShowReportModal(false);
+    } catch (err) {
+      alert("Failed to submit report");
+    }
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!ticket) return <p>Ticket not found</p>;
   return (
     <DashboardLayout>
       <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
-
         {/* HEADER */}
         <div style={{ marginBottom: "20px" }}>
           <h2>{ticket.title}</h2>
@@ -208,36 +232,73 @@ function TicketDetails() {
             ))}
           </div>
 
-
           {/* Add Comment */}
-          {(role === "AGENT" || role === "USER") && ticket.status !== "CLOSED" && (
-            <div style={{ marginTop: "20px" }}>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Write a comment..."
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "8px",
-              }}
-            />
-            <button
-              style={{
-                marginTop: "10px",
-                padding: "8px 16px",
-                borderRadius: "6px",
-                border: "none",
-                background: "#0d6efd",
-                color: "white",
-              }}
-              onClick={addComment}
-            >
-              Add Comment
-            </button>
-          </div>
-          )}
+          {(role === "AGENT" || role === "USER") &&
+            ticket.status !== "CLOSED" && (
+              <div style={{ marginTop: "20px" }}>
+                <textarea
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Write a comment..."
+                  style={{
+                    width: "100%",
+                    padding: "10px",
+                    borderRadius: "8px",
+                  }}
+                />
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <button
+                    className="btn btn-primary mt-2 px-3 py-2 rounded border-0"
+                    onClick={addComment}
+                  >
+                    Add Comment
+                  </button>
+
+                  {role === "USER" && (
+                    <button
+                      className="btn btn-danger mt-2 px-3 py-2 rounded border-0"
+                      onClick={() => setShowReportModal(true)}
+                    >
+                      Report
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
         </div>
+
+        <Modal
+          show={showReportModal}
+          onHide={() => setShowReportModal(false)}
+          centered
+        >
+          <div style={{ padding: "20px" }}>
+            <h4>Report Agent</h4>
+
+            <textarea
+              className="form-control mt-3"
+              rows={4}
+              value={reportText}
+              onChange={(e) => setReportText(e.target.value)}
+              placeholder="Explain what happened..."
+            />
+
+            <div className="mt-3 d-flex justify-content-end gap-2">
+              <button
+                className="btn btn-secondary"
+                onClick={() => setShowReportModal(false)}
+              >
+                Cancel
+              </button>
+
+              <button className="btn btn-danger" onClick={handleReport}>
+                Submit
+              </button>
+            </div>
+          </div>
+        </Modal>
       </div>
     </DashboardLayout>
   );

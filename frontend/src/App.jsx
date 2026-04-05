@@ -16,6 +16,7 @@ import ManageUsers from "./components/ManageUser";
 import Profile from "./components/Profile";
 import UserDetails from "./components/UserDetails";
 import InactiveUsers from "./components/InactiveUser";
+import AdminReports from "./components/AdminReports";
 
 function App() {
   const { role } = useAuth();
@@ -71,7 +72,7 @@ function App() {
             }
           />
           <Route path="/admin/users/active" element={<ManageUsers />} />
-          <Route path="/admin/users/inactive" element={<InactiveUsers/>} />
+          <Route path="/admin/users/inactive" element={<InactiveUsers />} />
           <Route path="/profile" element={<Profile />} />
           <Route
             path="/users/:id"
@@ -81,6 +82,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="/admin/reports" element={<AdminReports />} />
         </Routes>
       </div>
     </>

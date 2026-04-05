@@ -12,6 +12,7 @@ function UserDetails() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [comment, setComment] = useState("");
+  const [reports, setReports] = useState([]);
 
   useEffect(() => {
     setLoading(true);
@@ -27,13 +28,12 @@ function UserDetails() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // const deleteUser = () => {
-  //   if (!window.confirm("Are you sure you want to delete this user?")) return;
-
-  //   api.delete(`/admin/users/${id}`).then(() => {
-  //     navigate("/admin/users");
-  //   });
-  // };
+  useEffect(() => {
+    api
+      .get(`/reports/agent/${id}`)
+      .then((res) => setReports(res.data))
+      .catch(() => console.log("No reports found"));
+  }, [id]);
 
   const toggleStatus = async () => {
     try {
@@ -85,7 +85,7 @@ function UserDetails() {
               Delete User
             </button> */}
 
-              <button
+            <button
               className={`btn ${user.active ? "btn-warning" : "btn-success"}`}
               onClick={toggleStatus}
             >
@@ -164,41 +164,37 @@ function UserDetails() {
         )}
 
         {/* REPORT / COMMENTS SECTION */}
-        <div>
-          <h4>User Reports</h4>
+        <div style={{ marginTop: "40px" }}>
+          <h4 style={{ marginBottom: "15px" }}>
+            🚩 Reports Against This Agent
+          </h4>
 
-          <div
-            style={{
-              background: "#f8f9fa",
-              padding: "20px",
-              borderRadius: "10px",
-            }}
-          >
-            <p>No reports yet.</p>
-          </div>
+          {reports.length === 0 && (
+            <p style={{ color: "gray" }}>No reports for this agent</p>
+          )}
 
-          <div style={{ marginTop: "20px" }}>
-            <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
-              placeholder="Add admin note..."
+          {reports.map((r) => (
+            <div
+              key={r.id}
               style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "8px",
+                background: "#f8f9fa",
+                padding: "15px",
+                borderRadius: "10px",
+                marginBottom: "10px",
+                borderLeft: "4px solid #dc3545",
+                cursor: "pointer",
               }}
-            />
-            <button
-              className="btn btn-pink mt-2"
-              style={{ color: "white" }}
-              onClick={() => {
-                // console.log("Admin comment:", comment);
-                setComment("");
-              }}
+              onClick={() => navigate(`/tickets/${r.ticketId}`)}
             >
-              Add Comment
-            </button>
-          </div>
+              <div style={{ fontWeight: "bold" }}>{r.reportedByName}</div>
+
+              <div style={{ fontSize: "13px", color: "gray" }}>
+                Ticket #{r.ticketId} • {new Date(r.createdAt).toLocaleString()}
+              </div>
+
+              <div style={{ marginTop: "5px" }}>{r.message}</div>
+            </div>
+          ))}
         </div>
       </div>
     </DashboardLayout>

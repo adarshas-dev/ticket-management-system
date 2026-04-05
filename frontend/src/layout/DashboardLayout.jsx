@@ -7,17 +7,21 @@ import { Button } from "react-bootstrap";
 function DashboardLayout({ children }) {
   const [stats, setStats] = useState(null);
   const [collapsed, setCollapsed] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
   const { role, name } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (role === "ADMIN") {
-      api.get("/dashboard/stats").then((res) => setStats(res.data));
-    }
-
-    if (role === "AGENT") {
-      api.get("/dashboard/agent-stats").then((res) => setStats(res.data));
-    }
+    if (role !== "ADMIN") return;
+    const fetchUnread = () => {
+      api
+        .get("/reports/unread-count")
+        .then((res) => setUnreadCount(res.data))
+        .catch(() => setUnreadCount(0));
+    };
+    fetchUnread();
+    const interval = setInterval(fetchUnread, 5000);
+    return () => clearInterval(interval);
   }, [role]);
 
   const sidebarWidth = collapsed ? "80px" : "260px";
@@ -98,6 +102,13 @@ function DashboardLayout({ children }) {
                 label="Inactive Users"
                 collapsed={collapsed}
               />
+              <SidebarLink
+                to="/admin/reports"
+                icon="fa-flag"
+                label="Reports"
+                collapsed={collapsed}
+                showDot={unreadCount > 0}
+              />
             </>
           )}
 
@@ -174,7 +185,9 @@ function DashboardLayout({ children }) {
             borderBottom: "1px solid #ddd",
           }}
         >
-          <Button className="me-2 btn-pink" onClick={() => navigate(-1)}><i className="fa-solid fa-left-long"></i></Button>
+          <Button className="me-2 btn-pink" onClick={() => navigate(-1)}>
+            <i className="fa-solid fa-left-long"></i>
+          </Button>
           {role === "ADMIN" && <h5 style={{ margin: 0 }}>Admin Dashboard</h5>}
           {role === "AGENT" && <h5 style={{ margin: 0 }}>Agent Dashboard</h5>}
           {role === "USER" && <h5 style={{ margin: 0 }}>User Dashboard</h5>}
@@ -195,7 +208,7 @@ function DashboardLayout({ children }) {
 }
 
 /* Sidebar link component */
-function SidebarLink({ to, icon, label, collapsed }) {
+function SidebarLink({ to, icon, label, collapsed, showDot }) {
   return (
     <Link
       to={to}
@@ -209,10 +222,15 @@ function SidebarLink({ to, icon, label, collapsed }) {
         color: "white",
         textDecoration: "none",
         marginBottom: "10px",
+        position: "relative", // ✅ IMPORTANT for dot positioning
       }}
     >
       <i className={`fa-solid ${icon}`}></i>
+
       {!collapsed && <span>{label}</span>}
+
+      {/* ✅ Notification Dot */}
+      {showDot && <span className="notification-dot"></span>}
     </Link>
   );
 }

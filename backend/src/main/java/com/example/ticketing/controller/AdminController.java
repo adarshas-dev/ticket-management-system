@@ -226,7 +226,7 @@ public class AdminController {
 
             for (Ticket t : tickets) {
 
-                // Skip already closed tickets
+                // skip already closed tickets
                 if (t.getStatus() == TicketStatus.CLOSED) continue;
 
                 User newAgent = activeAgents.get(index % activeAgents.size());
