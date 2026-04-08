@@ -1,6 +1,7 @@
 package com.example.ticketing.repository;
 
 import com.example.ticketing.TicketingApplication;
+import com.example.ticketing.model.Priority;
 import com.example.ticketing.model.Ticket;
 import com.example.ticketing.model.TicketStatus;
 import com.example.ticketing.model.User;
@@ -23,4 +24,15 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByAssignedAgentIsNull();
 
     List<Ticket> findByAssignedAgentIsNullAndStatus(TicketStatus status);
+    List<Ticket> findTop3ByAssignedAgentAndPriorityInAndStatusInOrderByCreatedAtAsc(
+            User agent,
+            List<Priority> priorities,
+            List<TicketStatus> statuses
+    );
+
+    long countByAssignedAgentAndSeenByAgentFalse(User agent);
+
+    List<Ticket> findByAssignedAgentAndSeenByAgentFalse(User agent);
+
+    List<Ticket> findByStatusAndAssignedAgent(TicketStatus status, User agent);
 }

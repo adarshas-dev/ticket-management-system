@@ -1,11 +1,11 @@
 package com.example.ticketing.controller;
 
-import com.example.ticketing.model.Ticket;
-import com.example.ticketing.model.TicketStatus;
-import com.example.ticketing.model.User;
+import com.example.ticketing.model.*;
+import com.example.ticketing.repository.TicketRepository;
 import com.example.ticketing.service.TicketService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -16,9 +16,11 @@ import java.util.List;
 @CrossOrigin
 public class TicketController {
     private final TicketService ticketService;
+    private final TicketRepository ticketRepository;
 
-    public TicketController(TicketService ticketService) {
+    public TicketController(TicketService ticketService, TicketRepository ticketRepository) {
         this.ticketService = ticketService;
+        this.ticketRepository = ticketRepository;
     }
 
     //create ticket
@@ -69,10 +71,18 @@ public class TicketController {
     }
 
     //get the tickets according to the status
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN','AGENT')")
     @GetMapping("/status/{status}")
     public List<Ticket> getTicketsByStatus(@PathVariable TicketStatus status) {
-        return ticketService.getTicketsByStatus(status);
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+
+        if (user.getRole() == Role.ADMIN) {
+            return ticketService.getTicketsByStatus(status);
+        }
+
+        return ticketService.getTicketsByStatusForAgent(status, user);
     }
 
     //gets assigned tickets for the agent in the sidebar
@@ -86,6 +96,41 @@ public class TicketController {
         return ticketService.getAssignedTicketsByStatus(agent.getEmail(), status);
     }
 
+    @GetMapping("/agent/priority-tickets")
+    @PreAuthorize("hasRole('AGENT')")
+    public List<Ticket> getPriorityTickets() {
 
+        User agent = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        return ticketRepository
+                .findTop3ByAssignedAgentAndPriorityInAndStatusInOrderByCreatedAtAsc(
+                        agent,
+                        List.of(Priority.URGENT, Priority.HIGH),
+                        List.of(TicketStatus.OPEN, TicketStatus.IN_PROGRESS)
+                );
+    }
+
+    //agent notification
+    @GetMapping("/agent/unread-count")
+    @PreAuthorize("hasRole('AGENT')")
+    public long unreadTickets(){
+        User agent = (User) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return ticketRepository.countByAssignedAgentAndSeenByAgentFalse(agent);
+    }
+
+    @PutMapping("/agent/mark-seen")
+    public void markSeen(){
+        User agent = (User) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+        List<Ticket> tickets = ticketRepository.findByAssignedAgentAndSeenByAgentFalse(agent);
+        tickets.forEach(t -> t.setSeenByAgent(true));
+        ticketRepository.saveAll(tickets);
+    }
 
 }

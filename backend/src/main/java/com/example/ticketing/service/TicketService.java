@@ -127,10 +127,15 @@ public class TicketService {
 
             ticket.setAssignedAgent(agent);
             ticket.setStatus(TicketStatus.IN_PROGRESS);
+            ticket.setSeenByAgent(false);
 
             index++;
         }
 
         ticketRepository.saveAll(tickets);
+    }
+
+    public List<Ticket> getTicketsByStatusForAgent(TicketStatus status, User agent) {
+        return ticketRepository.findByStatusAndAssignedAgent(status, agent);
     }
 }

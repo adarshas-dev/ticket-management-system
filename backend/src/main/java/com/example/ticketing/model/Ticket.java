@@ -43,4 +43,6 @@ public class Ticket {
 
     @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL)
     private List<Comment> comments;
+
+    private boolean seenByAgent = false;
 }
