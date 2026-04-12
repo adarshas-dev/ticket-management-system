@@ -32,6 +32,7 @@ public class TicketService {
         if (ticket.getPriority() == null) {
             ticket.setPriority(Priority.MEDIUM);
         }
+        ticket.setSeenByAgent(false);
 
         return ticketRepository.save(ticket);
     }

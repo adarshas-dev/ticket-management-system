@@ -10,21 +10,16 @@ function Profile() {
 
   return (
     <DashboardLayout>
-      <div style={{ maxWidth: "700px", margin: "0 auto" }}>
+      <div className="profile-container">
 
         {/* Header */}
         <div style={{ marginBottom: "25px" }}>
-          <h2>My Profile</h2>
+          <h2 className="text-format">My Profile</h2>
         </div>
 
         {/* Profile Card */}
         <div
-          style={{
-            background: "#f8f9fa",
-            padding: "30px",
-            borderRadius: "12px",
-            boxShadow: "0 5px 15px rgba(0,0,0,0.05)"
-          }}
+          className="profile-card"
         >
           <form >
 

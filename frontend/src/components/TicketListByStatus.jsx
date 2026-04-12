@@ -6,6 +6,8 @@ import DashboardLayout from "../layout/DashboardLayout";
 import { Table } from "react-bootstrap";
 import StatusBadge from "./StatusBadge";
 import PriorityBadge from "./PriorityBadge";
+import { toast } from "react-toastify";
+import ThemeTable from "./ThemeTable";
 
 function TicketListByStatus() {
   const { status } = useParams();
@@ -43,7 +45,7 @@ function TicketListByStatus() {
 
   return (
     <DashboardLayout>
-      <div>
+      <div className="titcket-list-container">
         <div
           style={{
             display: "flex",
@@ -52,7 +54,9 @@ function TicketListByStatus() {
             marginBottom: "20px",
           }}
         >
-          <h2 style={{ margin: 0 }}>{status} Tickets</h2>
+          <h2 style={{ margin: 0 }} className="text-format">
+            {status} Tickets
+          </h2>
 
           {role === "ADMIN" && status === "OPEN" && (
             <button
@@ -61,10 +65,10 @@ function TicketListByStatus() {
                 api
                   .put("/admin/tickets/auto-assign")
                   .then(() => {
-                    alert("Tickets assigned successfully");
+                    toast.success("Tickets assigned successfully");
                     window.location.reload();
                   })
-                  .catch(() => alert("Failed to assign tickets"));
+                  .catch(() => toast.error("Failed to assign tickets"));
               }}
             >
               ⚡ Auto Assign Tickets
@@ -75,10 +79,12 @@ function TicketListByStatus() {
         {loading && <p>Loading tickets...</p>}
         {error && <p style={{ color: "red" }}>{error}</p>}
 
-        {!loading && !error && tickets.length === 0 && <p>No tickets found</p>}
+        {!loading && !error && tickets.length === 0 && (
+          <p className="text-format">No tickets found</p>
+        )}
 
         {!loading && !error && tickets.length > 0 && (
-          <Table responsive striped hover>
+          <ThemeTable>
             <thead>
               <tr>
                 <th>ID</th>
@@ -105,7 +111,7 @@ function TicketListByStatus() {
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </ThemeTable>
         )}
       </div>
     </DashboardLayout>

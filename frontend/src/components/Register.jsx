@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import { toast } from "react-toastify";
 
 function Register() {
   const [email, setEmail] = useState("");
@@ -13,7 +14,7 @@ function Register() {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match");
+      toast.warning("Passwords do not match");
       return;
     }
 
@@ -26,7 +27,7 @@ function Register() {
 
       navigate("/login");
     } catch (err) {
-      alert("Registration failed");
+      toast.warning("Registration failed");
     }
   };
 

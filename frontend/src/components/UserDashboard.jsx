@@ -5,6 +5,7 @@ import { Button, Table } from "react-bootstrap";
 import DashboardLayout from "../layout/DashboardLayout";
 import StatusBadge from "./StatusBadge";
 import PriorityBadge from "./PriorityBadge";
+import ThemeTable from "./ThemeTable";
 
 function UserDashboard() {
   const [tickets, setTickets] = useState([]);
@@ -36,12 +37,12 @@ function UserDashboard() {
   return (
     <DashboardLayout>
       <div>
-        <h2>My Tickets</h2>
+        <h2 className="text-format">My Tickets</h2>
 
         {tickets.length === 0 ? (
           <p>No tickets found</p>
         ) : (
-          <Table responsive striped hover>
+          <ThemeTable>
             <thead>
               <tr>
                 <th>ID</th>
@@ -70,7 +71,7 @@ function UserDashboard() {
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </ThemeTable>
         )}
       </div>
     </DashboardLayout>

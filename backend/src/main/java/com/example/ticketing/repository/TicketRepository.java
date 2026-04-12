@@ -35,4 +35,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByAssignedAgentAndSeenByAgentFalse(User agent);
 
     List<Ticket> findByStatusAndAssignedAgent(TicketStatus status, User agent);
+
+    long countByPriority(Priority priority);
 }

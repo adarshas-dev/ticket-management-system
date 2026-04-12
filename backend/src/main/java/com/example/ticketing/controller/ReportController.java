@@ -67,13 +67,13 @@ public class ReportController {
     @GetMapping("/unread-count")
     @PreAuthorize("hasRole('ADMIN')")
     public long getUnreadReportCount() {
-        return reportRepository.countByIsReadFalseAndResolvedFalse();
+        return reportRepository.countByReadFalseAndResolvedFalse();
     }
 
     @PutMapping("/mark-read")
     @PreAuthorize("hasRole('ADMIN')")
     public void martReportAsRead() {
-        List <Report> reports = reportRepository.findByIsReadFalseAndResolvedFalse();
+        List <Report> reports = reportRepository.findByReadFalseAndResolvedFalse();
         for(Report r : reports){
             r.setRead(true);
         }

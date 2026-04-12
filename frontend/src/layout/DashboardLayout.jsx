@@ -6,10 +6,23 @@ import { Button } from "react-bootstrap";
 
 function DashboardLayout({ children }) {
   const [stats, setStats] = useState(null);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(
+    localStorage.getItem("sidebarCollapsed") === "true",
+  );
   const [unreadCount, setUnreadCount] = useState(0);
   const { role, name } = useAuth();
   const navigate = useNavigate();
+
+  // dark mode
+  const [dark, setDark] = useState(localStorage.getItem("dark") === "true");
+  useEffect(() => {
+    if (dark) {
+      document.body.classList.add("dark");
+    } else {
+      document.body.classList.remove("dark");
+    }
+    localStorage.setItem("dark", dark);
+  }, [dark]);
 
   useEffect(() => {
     if (role !== "ADMIN") return;
@@ -45,6 +58,7 @@ function DashboardLayout({ children }) {
           paddingTop: "70px",
         }}
       >
+        {/* side bar */}
         <div>
           {/* Toggle Button */}
           <div
@@ -57,7 +71,11 @@ function DashboardLayout({ children }) {
           >
             {!collapsed && <h5 style={{ margin: 10 }}>MENU</h5>}
             <button
-              onClick={() => setCollapsed(!collapsed)}
+              onClick={() => {
+                const newValue = !collapsed;
+                setCollapsed(newValue);
+                localStorage.setItem("sidebarCollapsed", newValue);
+              }}
               style={{
                 background: "transparent",
                 border: "none",
@@ -164,44 +182,51 @@ function DashboardLayout({ children }) {
 
       {/* MAIN CONTENT */}
       <div
+        className="main-content"
         style={{
           marginLeft: sidebarWidth,
           transition: "0.3s ease",
-          flex: 1,
-          height: "100vh",
-          display: "flex",
-          flexDirection: "column",
-          background: "#f8f9fa",
         }}
       >
-        <div
-          style={{
-            height: "70px",
-            background: "#ffffff",
-            display: "flex",
-            alignItems: "center",
-            padding: "0 30px",
-            marginTop: "70px",
-            borderBottom: "1px solid #ddd",
-          }}
-        >
-          <Button className="me-2 btn-pink" onClick={() => navigate(-1)}>
-            <i className="fa-solid fa-left-long"></i>
-          </Button>
-          {role === "ADMIN" && <h5 style={{ margin: 0 }}>Admin Dashboard</h5>}
-          {role === "AGENT" && <h5 style={{ margin: 0 }}>Agent Dashboard</h5>}
-          {role === "USER" && <h5 style={{ margin: 0 }}>User Dashboard</h5>}
+        <div className="top-header">
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Button className="me-2 btn-pink" onClick={() => navigate(-1)}>
+              <i className="fa-solid fa-left-long"></i>
+            </Button>
+            {role === "ADMIN" && (
+              <h5 className="dashboard-name">Admin Dashboard</h5>
+            )}
+            {role === "AGENT" && (
+              <h5 className="dashboard-name">Agent Dashboard</h5>
+            )}
+            {role === "USER" && (
+              <h5 className="dashboard-name">User Dashboard</h5>
+            )}
+          </div>
+
+          {/* dark mode toggle */}
+          <div className="toggle-switch">
+            <label className="switch-label">
+              <input
+                type="checkbox"
+                className="checkbox"
+                checked={!dark}
+                onChange={() => setDark(!dark)}
+              />
+              <span className="slider"></span>
+            </label>
+          </div>
+          {/* <div>
+            <button
+              className="btn btn-sm btn-light"
+              onClick={() => setDark(!dark)}
+            >
+              {dark ? "☀ Light" : "🌙 Dark"}
+            </button>
+          </div> */}
         </div>
 
-        <div
-          style={{
-            flex: 1,
-            overflowY: "auto",
-            padding: "30px",
-          }}
-        >
-          {children}
-        </div>
+        <div className="content-area">{children}</div>
       </div>
     </div>
   );

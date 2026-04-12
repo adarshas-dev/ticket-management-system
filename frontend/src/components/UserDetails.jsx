@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 import DashboardLayout from "../layout/DashboardLayout";
 import StatCard from "../components/StatCard";
+import { toast } from "react-toastify";
 
 function UserDetails() {
   const { id } = useParams();
@@ -57,7 +58,7 @@ function UserDetails() {
 
       setUser(res.data);
 
-      alert(user.active ? "User suspended" : "User activated");
+      toast.success(user.active ? "User suspended" : "User activated");
 
       window.location.reload();
     } catch (err) {
@@ -66,7 +67,7 @@ function UserDetails() {
         err.response?.data ||
         "Something went wrong";
 
-      alert(message);
+      toast.info(message);
     }
   };
 
@@ -78,7 +79,7 @@ function UserDetails() {
       <div style={{ maxWidth: "1100px", margin: "0 auto" }}>
         {/* HEADER */}
         <div style={{ marginBottom: "25px" }}>
-          <h2>{user.name}</h2>
+          <h2 className="text-format">{user.name}</h2>
 
           <div style={{ display: "flex", gap: "15px", marginTop: "10px" }}>
             {/* <button className="btn btn-danger" onClick={deleteUser}>
@@ -165,7 +166,7 @@ function UserDetails() {
 
         {/* REPORT / COMMENTS SECTION */}
         <div style={{ marginTop: "40px" }}>
-          <h4 style={{ marginBottom: "15px" }}>
+          <h4 style={{ marginBottom: "15px" }} className="text-format">
             🚩 Reports Against This Agent
           </h4>
 
@@ -176,23 +177,16 @@ function UserDetails() {
           {reports.map((r) => (
             <div
               key={r.id}
-              style={{
-                background: "#f8f9fa",
-                padding: "15px",
-                borderRadius: "10px",
-                marginBottom: "10px",
-                borderLeft: "4px solid #dc3545",
-                cursor: "pointer",
-              }}
+              className="report-card"
               onClick={() => navigate(`/tickets/${r.ticketId}`)}
             >
-              <div style={{ fontWeight: "bold" }}>{r.reportedByName}</div>
+              <div style={{ fontWeight: "bold" }} className="text-format">{r.reportedByName}</div>
 
               <div style={{ fontSize: "13px", color: "gray" }}>
                 Ticket #{r.ticketId} • {new Date(r.createdAt).toLocaleString()}
               </div>
 
-              <div style={{ marginTop: "5px" }}>{r.message}</div>
+              <div style={{ marginTop: "5px" }} className="text-format">{r.message}</div>
             </div>
           ))}
         </div>

@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
     List<Report> findByReportedAgentId(Long agentId);
-    Long countByIsReadFalse();
-    List<Report> findByIsReadFalse();
+    Long countByReadFalse();
+    List<Report> findByReadFalse();
     List<Report> findByResolvedFalse();
-    long countByIsReadFalseAndResolvedFalse();
-    List<Report> findByIsReadFalseAndResolvedFalse();
+    long countByReadFalseAndResolvedFalse();
+    List<Report> findByReadFalseAndResolvedFalse();
 }

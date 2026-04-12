@@ -1,3 +1,20 @@
+html, body {
+  background: #f8f9fa;
+}
+
+body.dark {
+  background: #121212;
+}
+
+#root {
+  background: inherit;
+  min-height: 100vh;
+}
+
+/* ========================================
+   NAVIGATION
+======================================== */
+
 .nav-item-custom {
   color: white;
   font-weight: 600;
@@ -16,6 +33,11 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
   transform: translateY(-1px);
 }
+
+/* ========================================
+   BUTTONS
+======================================== */
+
 .custom-btn {
   padding: 6px 12px;
   border-radius: 20px;
@@ -27,6 +49,19 @@
 .custom-btn:hover {
   background-color: #f8bbc0;
 }
+
+.btn-pink {
+  background-color: #c90c74;
+  border: #c90c74;
+}
+
+.btn-pink:hover {
+  background-color: #de4198;
+}
+
+/* ========================================
+   SIDEBAR
+======================================== */
 
 .sidebar-link {
   transition: all 0.2s ease;
@@ -47,26 +82,9 @@
   transform: translateX(4px);
 }
 
-
-.login-bg {
-  /* background-image: url("assets/images/bg-light.jpeg"); */
-  background-image: url("assets/images/bg-dark.jpeg");
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;   
-  width: 100%;
-  height: 100vh;            
-  margin: 0;
-}
-
-.btn-pink{
-  background-color: #c90c74;
-  border: #c90c74;
-}
-.btn-pink:hover{
-  background-color: #de4198;
-  /* border: #c32b7f; */
-}
+/* ========================================
+   NOTIFICATION
+======================================== */
 
 .notification-dot {
   position: absolute;
@@ -80,7 +98,332 @@
 }
 
 @keyframes blink {
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* ========================================
+   LAYOUT
+======================================== */
+
+.main-content {
+  flex: 1;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8f9fa;
+}
+
+.top-header {
+  height: 70px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  padding: 0 30px;
+  margin-top: 70px;
+  border-bottom: 1px solid #ddd;
+  justify-content: space-between;
+}
+
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  padding: 30px;
+}
+
+.dashboard-name {
+  margin: 0;
+  color: black;
+}
+
+/* ========================================
+   DASHBOARD
+======================================== */
+
+.dashboard-card {
+  height: 300px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.stat-card {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: 0.25s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+}
+
+.stat-title {
+  margin-bottom: 10px;
+  color: #6c757d;
+}
+
+.stat-value {
+  font-weight: 700;
+}
+
+/* ========================================
+   TICKETS
+======================================== */
+
+.ticket-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.ticket-card {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.comment-card {
+  background: #f1f3f5;
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.ticket-list-container {
+  width: 100%;
+}
+
+.text-format {
+  color: black;
+}
+
+/* ========================================
+   FORMS
+======================================== */
+
+.form-container,
+.profile-container,
+.create-ticket-container {
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.form-card,
+.profile-card {
+  background: #f8f9fa;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+.form-subtitle {
+  color: #6c757d;
+}
+
+/* ========================================
+   USERS TABLE
+======================================== */
+
+.manage-users-page h2 {
+  margin-bottom: 20px;
+}
+
+/* ========================================
+   MODAL
+======================================== */
+
+.report-modal {
+  border-radius: 12px;
+}
+
+.report-card {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  border-left: 4px solid #dc3545;
+  cursor: pointer;
+}
+
+
+/* ========================================
+   LOGIN
+======================================== */
+
+.login-bg {
+  background-image: url("assets/images/bg-light.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.login-bg .card {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+/* =====================================================
+   ==================== DARK MODE =======================
+===================================================== */
+
+body.dark .report-modal {
+  border-radius: 12px;
+  background-color: #181717;
+}
+
+body.dark .report-card{
+  background: rgb(5, 5, 5);
+}
+
+body.dark .main-content {
+  background: #121212;
+}
+
+body.dark .top-header {
+  background: #1e1e1e;
+  border-bottom: 1px solid #333;
+}
+
+body.dark .dashboard-card,
+body.dark .stat-card,
+body.dark .ticket-card,
+body.dark .form-card,
+body.dark .profile-card {
+  background: #1e1e1e;
+  color: #e4e6eb;
+}
+
+body.dark .comment-card {
+  background: #2a2a2a;
+  color: #e4e6eb;
+}
+
+body.dark .dashboard-name,
+body.dark .text-format {
+  color: #ffffff;
+}
+
+body.dark .sidebar-section:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* DARK INPUTS */
+
+body.dark textarea,
+body.dark select,
+body.dark .form-control,
+body.dark .form-select {
+  background: #2a2a2a;
+  color: white;
+  border: 1px solid #444;
+}
+
+body.dark .form-control::placeholder {
+  color: #aaa;
+}
+
+body.dark .form-label {
+  color: #cfcfcf;
+}
+
+body.dark .input-group .btn {
+  background: #2a2a2a;
+  color: white;
+  border: 1px solid #444;
+}
+
+/* DARK LOGIN */
+
+body.dark .login-bg {
+  background-image:
+    linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.4)),
+    url("assets/images/bg-light.jpeg");
+}
+
+body.dark .login-bg .card {
+  background: rgba(30, 30, 30, 0.9);
+  color: #e4e6eb;
+  border: 1px solid #333;
+}
+
+body.dark .login-bg a {
+  color: #ff4da6;
+}
+
+body.dark .login-bg .alert-danger {
+  background: #3a1f1f;
+  color: #ffb3b3;
+  border: 1px solid #5a2a2a;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  --light: #d8dbe0;
+  --dark: #28292c;
+}
+
+.switch-label {
+  position: absolute;
+  width: 100%;
+  height: 26px;
+  background-color: var(--dark);
+  border-radius: 20px;
+  cursor: pointer;
+  border: 2px solid var(--dark);
+}
+
+.checkbox {
+  position: absolute;
+  display: none;
+}
+
+.slider {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  transition: 0.3s;
+}
+
+.checkbox:checked ~ .slider {
+  background-color: var(--light);
+}
+
+.slider::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  box-shadow: inset 7px -2px 0px 0px var(--light);
+  background-color: var(--dark);
+  transition: 0.3s;
+}
+
+.checkbox:checked ~ .slider::before {
+  transform: translateX(22px);
+  background-color: var(--dark);
+  box-shadow: none;
 }

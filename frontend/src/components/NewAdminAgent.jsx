@@ -3,6 +3,7 @@ import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import DashboardLayout from "../layout/DashboardLayout";
+import { toast } from "react-toastify";
 
 function NewAdminAgent() {
   const [name, setName] = useState("");
@@ -26,27 +27,20 @@ function NewAdminAgent() {
       navigate("/");
     } catch (err) {
       console.error(err);
-      alert("Failed to create user");
+      toast.error("Failed to create user");
     }
   };
 
   return (
     <DashboardLayout>
-      <div style={{ maxWidth: "700px", margin: "0 auto" }}>
+      <div className="form-container">
         {/* Header */}
         <div style={{ marginBottom: "25px" }}>
-          <h2>Create New User</h2>
+          <h2 className="text-format">Create New User</h2>
         </div>
 
         {/* Form Card */}
-        <div
-          style={{
-            background: "#f8f9fa",
-            padding: "30px",
-            borderRadius: "12px",
-            boxShadow: "0 5px 15px rgba(0,0,0,0.05)",
-          }}
-        >
+        <div className="form-card">
           <form onSubmit={handleSubmit}>
             {/* Name */}
             <div className="mb-4">
@@ -91,7 +85,11 @@ function NewAdminAgent() {
                   className="btn border"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ?  <i className="fa-regular fa-eye-slash"></i> : <i className="fa-solid fa-eye"></i>}
+                  {showPassword ? (
+                    <i className="fa-regular fa-eye-slash"></i>
+                  ) : (
+                    <i className="fa-solid fa-eye"></i>
+                  )}
                 </button>
               </div>
             </div>

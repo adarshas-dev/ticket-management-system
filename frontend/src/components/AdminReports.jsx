@@ -3,6 +3,8 @@ import api from "../api/axios";
 import DashboardLayout from "../layout/DashboardLayout";
 import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import ThemeTable from "./ThemeTable";
 
 function AdminReports() {
   const [reports, setReports] = useState([]);
@@ -12,15 +14,15 @@ function AdminReports() {
     api
       .get("/reports")
       .then((res) => setReports(res.data))
-      .catch(() => alert("Failed to load reports"));
+      .catch(() => toast.error("Failed to load reports"));
     api.put("/reports/mark-read");
   }, []);
 
   return (
     <DashboardLayout>
-      <h2>Reports</h2>
+      <h2 className="text-format">Reports</h2>
 
-      <Table responsive striped hover>
+      <ThemeTable>
         <thead>
           <tr>
             <th>No.</th>
@@ -38,20 +40,23 @@ function AdminReports() {
             <tr key={r.id}>
               <td>{index + 1}</td>
               <td
-                style={{ cursor: "pointer", color: "blue" }}
+                style={{ cursor: "pointer", textDecoration: "underline" }}
+                className="text-format"
                 onClick={() => navigate(`/users/${r.userId}`)}
               >
                 {r.reportedByName}
               </td>
               <td
-                style={{ cursor: "pointer", color: "blue" }}
+                style={{ cursor: "pointer", textDecoration: "underline" }}
+                className="text-format"
                 onClick={() => navigate(`/users/${r.agentId}`)}
               >
                 {r.agentName}
               </td>
 
               <td
-                style={{ cursor: "pointer", color: "blue" }}
+                style={{ cursor: "pointer", textDecoration: "underline" }}
+                className="text-format"
                 onClick={() => navigate(`/tickets/${r.ticketId}`)}
               >
                 #{r.ticketId}
@@ -71,7 +76,7 @@ function AdminReports() {
                       .then(() => {
                         setReports(reports.filter((rep) => rep.id !== r.id));
                       })
-                      .catch(() => alert("Failed to resolve"));
+                      .catch(() => toast.error("Failed to resolve"));
                   }}
                 >
                   Resolve
@@ -80,7 +85,7 @@ function AdminReports() {
             </tr>
           ))}
         </tbody>
-      </Table>
+      </ThemeTable>
     </DashboardLayout>
   );
 }

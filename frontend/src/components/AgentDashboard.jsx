@@ -6,6 +6,7 @@ import DashboardLayout from "../layout/DashboardLayout";
 import StatusBadge from "./StatusBadge";
 import PriorityBadge from "./PriorityBadge";
 import StatCard from "../components/StatCard";
+import ThemeTable from "./ThemeTable";
 
 function AgentDashboard() {
   const [tickets, setTickets] = useState([]);
@@ -23,7 +24,7 @@ function AgentDashboard() {
   const filteredTickets = tickets.filter((t) => {
     return (
       t.title.toLowerCase().includes(search.toLocaleLowerCase()) &&
-      (statusFilter ? t.status ===statusFilter : true) &&
+      (statusFilter ? t.status === statusFilter : true) &&
       (priorityFilter ? t.priority === priorityFilter : true)
     );
   });
@@ -53,35 +54,40 @@ function AgentDashboard() {
     return new Date(a.createdAt) - new Date(b.createdAt);
   });
 
-  
-
   useEffect(() => {
-    api
-      .get("/tickets/assigned")
-      .then((res) => setTickets(res.data))
-      .catch((err) => {
-        setError(
-          err.response?.status === 403
-            ? "Not authorized"
-            : "Failed to load tickets",
-        );
-      })
-      .finally(() => setLoading(false));
+    const fetchData = () => {
+      api
+        .get("/tickets/assigned")
+        .then((res) => setTickets(res.data))
+        .catch((err) => {
+          setError(
+            err.response?.status === 403
+              ? "Not authorized"
+              : "Failed to load tickets",
+          );
+        })
+        .finally(() => setLoading(false));
 
-    api.get("/dashboard/agent-stats").then((res) => setStats(res.data));
+      api.get("/dashboard/agent-stats").then((res) => setStats(res.data));
 
-    api
-      .get("/tickets/agent/priority-tickets")
-      .then((res) => setPriorityTickets(res.data));
-  }, []);
+      api
+        .get("/tickets/agent/priority-tickets")
+        .then((res) => setPriorityTickets(res.data));
 
-  //unread api
-  useEffect(() => {
-    api.get("/tickets/agent/unread-count").then((res) => setUnread(res.data));
-    // delay marking as seen
+      api.get("/tickets/agent/unread-count").then((res) => setUnread(res.data));
+    };
+
+    fetchData();
+
+    // auto refresh every 5 sec
+    const interval = setInterval(fetchData, 5000);
+
+    // mark seen
     setTimeout(() => {
       api.put("/tickets/agent/mark-seen");
     }, 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   if (loading) return <p>Loading assigned tickets...</p>;
@@ -89,6 +95,7 @@ function AgentDashboard() {
 
   return (
     <DashboardLayout>
+      {/* filter & search */}
       <div
         style={{
           display: "flex",
@@ -133,6 +140,7 @@ function AgentDashboard() {
         </select>
       </div>
 
+      {/* notification */}
       <div>
         {unread > 0 && (
           <div className="alert alert-warning">
@@ -179,7 +187,7 @@ function AgentDashboard() {
         )}
 
         <div style={{ marginBottom: "25px" }}>
-          <h4>🔥 Priority Tickets</h4>
+          <h4 className="text-format">🔥 Priority Tickets</h4>
 
           {priorityTickets.length === 0 ? (
             <p style={{ color: "gray" }}>No urgent tickets</p>
@@ -212,7 +220,7 @@ function AgentDashboard() {
         {tickets.length === 0 ? (
           <p>No assigned tickets</p>
         ) : (
-          <Table responsive striped hover>
+          <ThemeTable>
             <thead>
               <tr>
                 <th>ID</th>
@@ -245,7 +253,7 @@ function AgentDashboard() {
                 </tr>
               ))}
             </tbody>
-          </Table>
+          </ThemeTable>
         )}
       </div>
     </DashboardLayout>

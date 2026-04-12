@@ -1,4 +1,5 @@
 import "./App.css";
+// import "./style/dark.css"
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "./components/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -17,6 +18,8 @@ import Profile from "./components/Profile";
 import UserDetails from "./components/UserDetails";
 import InactiveUsers from "./components/InactiveUser";
 import AdminReports from "./components/AdminReports";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   const { role } = useAuth();
@@ -84,6 +87,7 @@ function App() {
           />
           <Route path="/admin/reports" element={<AdminReports />} />
         </Routes>
+          <ToastContainer position="top-right" autoClose={3000} />
       </div>
     </>
   );

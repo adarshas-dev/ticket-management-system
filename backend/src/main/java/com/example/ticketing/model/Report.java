@@ -1,9 +1,6 @@
 package com.example.ticketing.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -29,6 +26,9 @@ public class Report {
     private Ticket ticket;
     private String message;
     private LocalDateTime createdAt;
-    private boolean isRead = false;
-    private boolean resolved = false;
+
+    @Column(name = "is_read")
+    private Boolean read = false;
+
+    private Boolean resolved = false;
 }

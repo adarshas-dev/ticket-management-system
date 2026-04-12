@@ -4,6 +4,7 @@ import api from "../api/axios";
 import { useAuth } from "../auth/AuthContext";
 import DashboardLayout from "../layout/DashboardLayout";
 import { Modal } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 function TicketDetails() {
   const { id } = useParams();
@@ -70,7 +71,7 @@ function TicketDetails() {
 
   const handleReport = async () => {
     if (!reportText.trim()) {
-      alert("Please enter report details");
+      toast.info("Please enter report details");
       return;
     }
 
@@ -81,12 +82,12 @@ function TicketDetails() {
         message: reportText,
       });
 
-      alert("Report submitted successfully");
+      toast.success("Report submitted successfully");
 
       setReportText("");
       setShowReportModal(false);
     } catch (err) {
-      alert("Failed to submit report");
+      toast.error("Failed to submit report");
     }
   };
 
@@ -94,10 +95,10 @@ function TicketDetails() {
   if (!ticket) return <p>Ticket not found</p>;
   return (
     <DashboardLayout>
-      <div style={{ maxWidth: "1000px", margin: "0 auto" }}>
+      <div className="ticket-container">
         {/* HEADER */}
         <div style={{ marginBottom: "20px" }}>
-          <h2>{ticket.title}</h2>
+          <h2 className="text-format">{ticket.title}</h2>
 
           <div style={{ display: "flex", gap: "15px", marginTop: "10px" }}>
             <span
@@ -107,6 +108,7 @@ function TicketDetails() {
                 // backgroundColor: "#e9ecef",
                 backgroundColor: getStatusColor(ticket.status),
                 fontWeight: "bold",
+                color: "white"
               }}
             >
               {formatStatus(ticket.status)}
@@ -136,13 +138,7 @@ function TicketDetails() {
           }}
         >
           {/* LEFT SIDE - INFO */}
-          <div
-            style={{
-              background: "#f8f9fa",
-              padding: "20px",
-              borderRadius: "10px",
-            }}
-          >
+          <div className="ticket-card">
             <h4>Description</h4>
             <p>{ticket.description}</p>
 
@@ -154,13 +150,7 @@ function TicketDetails() {
           </div>
 
           {/* RIGHT SIDE - ACTIONS */}
-          <div
-            style={{
-              background: "#f8f9fa",
-              padding: "20px",
-              borderRadius: "10px",
-            }}
-          >
+          <div className="ticket-card">
             {/* Agent Update Status */}
             {role === "AGENT" && (
               <>
@@ -210,22 +200,15 @@ function TicketDetails() {
 
         {/* COMMENTS SECTION */}
         <div>
-          <h3>Comments</h3>
+          <h3 className="text-format">Comments</h3>
 
-          {ticket.comments?.length === 0 && <p>No comments yet</p>}
+          {ticket.comments?.length === 0 && <p className="text-format">No comments yet</p>}
 
           <div
             style={{ display: "flex", flexDirection: "column", gap: "10px" }}
           >
             {ticket.comments?.map((c) => (
-              <div
-                key={c.id}
-                style={{
-                  background: "#f1f3f5",
-                  padding: "12px",
-                  borderRadius: "8px",
-                }}
-              >
+              <div key={c.id} className="comment-card">
                 <b>{c.user?.name}</b>
                 <p style={{ margin: "5px 0 0 0" }}>{c.message}</p>
               </div>
@@ -273,9 +256,10 @@ function TicketDetails() {
           show={showReportModal}
           onHide={() => setShowReportModal(false)}
           centered
+          contentClassName="report-modal"
         >
           <div style={{ padding: "20px" }}>
-            <h4>Report Agent</h4>
+            <h4 className="text-format">Report Agent</h4>
 
             <textarea
               className="form-control mt-3"

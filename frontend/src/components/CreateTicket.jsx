@@ -3,6 +3,7 @@ import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
 import { Button } from "react-bootstrap";
 import DashboardLayout from "../layout/DashboardLayout";
+import { toast } from "react-toastify";
 
 function CreateTicket() {
   const [title, setTitle] = useState("");
@@ -23,30 +24,24 @@ function CreateTicket() {
       navigate("/");
     } catch (err) {
       console.error(err);
-      alert("Failed to create ticket");
+      toast.error("Failed to create ticket");
     }
   };
 
   return (
   <DashboardLayout>
-    <div style={{ maxWidth: "700px", margin: "0 auto" }}>
+    <div className="create-ticket-container">
       
       {/* Header */}
       <div style={{ marginBottom: "25px" }}>
-        <h2>Create New Ticket</h2>
-        <p style={{ color: "#6c757d" }}>
+        <h2 className="text-format">Create New Ticket</h2>
+        <p className="form-subtitle">
           Fill in the details below to raise a new support request.
         </p>
       </div>
 
       {/* Form Card */}
-      <div
-        style={{
-          background: "#f8f9fa",
-          padding: "30px",
-          borderRadius: "12px",
-          boxShadow: "0 5px 15px rgba(0,0,0,0.05)"
-        }}
+      <div className="form-card"
       >
         <form onSubmit={handleSubmit}>
 
