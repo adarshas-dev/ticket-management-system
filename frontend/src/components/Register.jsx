@@ -84,7 +84,7 @@ function Register() {
 
           <button
             type="submit"
-            className="btn btn-primary w-100 mt-2"
+            className="btn btn-pink w-100 mt-2 text-white"
           >
             Register
           </button>

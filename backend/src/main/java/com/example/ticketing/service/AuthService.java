@@ -8,6 +8,7 @@ import com.example.ticketing.model.Role;
 import com.example.ticketing.model.User;
 import com.example.ticketing.repository.UserRepository;
 import com.example.ticketing.security.JwtUtil;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -58,5 +59,21 @@ public class AuthService {
         );
 
         return new AuthResponse(token);
+    }
+
+    public void changePassword(String currentPassword, String newPassword) {
+
+        User user = (User) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new RuntimeException("Current password incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+
+        userRepository.save(user);
     }
 }

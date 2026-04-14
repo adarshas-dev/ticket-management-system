@@ -10,6 +10,7 @@ import com.example.ticketing.repository.TicketRepository;
 import com.example.ticketing.service.DashboardService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +47,40 @@ public class DashboardController {
 
         User user = (User) authentication.getPrincipal();
         return dashboardService.getStatsForAgent(user.getEmail());
+    }
+
+    //user stats
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/customer-stats")
+    public Map<String, Long> getCustomerStats() {
+
+        User user = (User) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        Map<String, Long> stats = new HashMap<>();
+
+        stats.put("total",
+                ticketRepository.countByCreatedBy(user));
+
+        stats.put("open",
+                ticketRepository.countByCreatedByAndStatus(
+                        user, TicketStatus.OPEN));
+
+        stats.put("inProgress",
+                ticketRepository.countByCreatedByAndStatus(
+                        user, TicketStatus.IN_PROGRESS));
+
+        stats.put("resolved",
+                ticketRepository.countByCreatedByAndStatus(
+                        user, TicketStatus.RESOLVED));
+
+        stats.put("closed",
+                ticketRepository.countByCreatedByAndStatus(
+                        user, TicketStatus.CLOSED));
+
+        return stats;
     }
 
     //chart

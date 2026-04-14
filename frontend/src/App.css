@@ -196,7 +196,7 @@ body.dark {
 }
 
 .ticket-card {
-  background: #f8f9fa;
+  background: rgb(240, 242, 245);
   padding: 20px;
   border-radius: 10px;
 }
@@ -426,4 +426,54 @@ body.dark .login-bg .alert-danger {
   transform: translateX(22px);
   background-color: var(--dark);
   box-shadow: none;
+}
+
+/* ===============================
+   PROFILE MODAL DARK MODE
+================================= */
+
+body.dark .modal-content {
+  background: #1e1e1e;
+  color: #e4e6eb;
+  border: 1px solid #333;
+}
+
+body.dark .modal-header {
+  border-bottom: 1px solid #333;
+}
+
+body.dark .modal-footer {
+  border-top: 1px solid #333;
+}
+
+body.dark .modal-title {
+  color: #ffffff;
+}
+
+body.dark .modal-body label {
+  color: #cfcfcf;
+}
+
+/* inputs inside modal */
+
+body.dark .modal-content .form-control {
+  background: #2a2a2a;
+  color: white;
+  border: 1px solid #444;
+}
+
+body.dark .modal-content .form-control::placeholder {
+  color: #aaa;
+}
+
+/* close button */
+
+body.dark .btn-close {
+  filter: invert(1);
+}
+
+/* backdrop darker */
+
+body.dark .modal-backdrop.show {
+  opacity: 0.8;
 }

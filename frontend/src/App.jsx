@@ -59,6 +59,10 @@ function App() {
             element={<TicketListByStatus />}
           />
           <Route
+            path="/user/tickets/:status"
+            element={<TicketListByStatus />}
+          />
+          <Route
             path="/create"
             element={
               <ProtectedRoute>

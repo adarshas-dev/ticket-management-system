@@ -6,11 +6,14 @@ import DashboardLayout from "../layout/DashboardLayout";
 import StatusBadge from "./StatusBadge";
 import PriorityBadge from "./PriorityBadge";
 import ThemeTable from "./ThemeTable";
+import StatCard from "./StatCard";
 
 function UserDashboard() {
   const [tickets, setTickets] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [stats, setStats] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -31,13 +34,78 @@ function UserDashboard() {
       });
   }, []);
 
+  useEffect(() => {
+    api.get("/dashboard/customer-stats").then((res) => setStats(res.data));
+  }, []);
+
   if (loading) return <p>Loading tickets...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   console.log("TICKETS DATA:", tickets);
   return (
     <DashboardLayout>
       <div>
-        <h2 className="text-format">My Tickets</h2>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "20px",
+            marginBottom: "25px",
+          }}
+        >
+          <StatCard
+            title="Total Tickets"
+            value={stats.total}
+            color="#fd7e14"
+            onClick={() => navigate("/user/tickets/ALL")}
+          />
+          <StatCard
+            title="Open"
+            value={stats.open}
+            color="#fd7e14"
+            onClick={() => navigate("/user/tickets/OPEN")}
+          />
+
+          <StatCard
+            title="In Progress"
+            value={stats.inProgress}
+            color="#ffc107"
+            onClick={() => navigate("/user/tickets/IN_PROGRESS")}
+          />
+
+          <StatCard
+            title="Resolved"
+            value={stats.resolved}
+            color="#198754"
+            onClick={() => navigate("/user/tickets/RESOLVED")}
+          />
+
+          <StatCard
+            title="Closed"
+            value={stats.closed}
+            color="#6c757d"
+            onClick={() => navigate("/user/tickets/CLOSED")}
+          />
+        </div>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <h2 className="text-format">My Tickets</h2>
+
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search..."
+            style={{ maxWidth: "300px" }}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
         {tickets.length === 0 ? (
           <p>No tickets found</p>
@@ -53,23 +121,33 @@ function UserDashboard() {
               </tr>
             </thead>
             <tbody>
-              {tickets.map((t) => (
-                <tr
-                  key={t.id}
-                  onClick={() => navigate(`/tickets/${t.id}`)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <td>{t.id}</td>
-                  <td>{t.title}</td>
-                  <td>
-                    <StatusBadge status={t.status} />
-                  </td>
-                  <td>
-                    <PriorityBadge priority={t.priority} />
-                  </td>
-                  <td>{new Date(t.createdAt).toLocaleDateString()}</td>
-                </tr>
-              ))}
+              {tickets
+                .filter((t) => {
+                  const q = search.toLowerCase();
+
+                  return (
+                    t.title?.toLowerCase().includes(q) ||
+                    t.status?.replace("_", " ").toLowerCase().includes(q) ||
+                    t.priority?.toLowerCase().includes(q)
+                  );
+                })
+                .map((t) => (
+                  <tr
+                    key={t.id}
+                    onClick={() => navigate(`/tickets/${t.id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <td>{t.id}</td>
+                    <td>{t.title}</td>
+                    <td>
+                      <StatusBadge status={t.status} />
+                    </td>
+                    <td>
+                      <PriorityBadge priority={t.priority} />
+                    </td>
+                    <td>{new Date(t.createdAt).toLocaleDateString()}</td>
+                  </tr>
+                ))}
             </tbody>
           </ThemeTable>
         )}

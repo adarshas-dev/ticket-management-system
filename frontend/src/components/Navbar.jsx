@@ -77,7 +77,7 @@ function Navbar() {
             style={navLinkStyle}
             className="text-white fw-semibold nav-item-custom"
           >
-            Assigned Tickets
+            Dashboard
           </NavLink>
         )}
 

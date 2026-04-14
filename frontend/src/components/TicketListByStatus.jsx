@@ -15,6 +15,7 @@ function TicketListByStatus() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -26,8 +27,12 @@ function TicketListByStatus() {
       endpoint = `/tickets/status/${status}`;
     } else if (role === "AGENT") {
       endpoint = `/tickets/assigned/status/${status}`;
-    } else {
-      return;
+    } else if (role === "USER") {
+      if (status === "ALL") {
+        endpoint = `/tickets/my`;
+      } else {
+        endpoint = `/tickets/my/status/${status}`;
+      }
     }
 
     api
@@ -52,28 +57,48 @@ function TicketListByStatus() {
             justifyContent: "space-between",
             alignItems: "center",
             marginBottom: "20px",
+            gap: "10px",
           }}
         >
           <h2 style={{ margin: 0 }} className="text-format">
             {status} Tickets
           </h2>
 
-          {role === "ADMIN" && status === "OPEN" && (
-            <button
-              className="btn btn-primary fw-bold shadow-sm"
-              onClick={() => {
-                api
-                  .put("/admin/tickets/auto-assign")
-                  .then(() => {
-                    toast.success("Tickets assigned successfully");
-                    window.location.reload();
-                  })
-                  .catch(() => toast.error("Failed to assign tickets"));
-              }}
-            >
-              ⚡ Auto Assign Tickets
-            </button>
-          )}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+              flex: 1,
+              justifyContent: "flex-end",
+            }}
+          >
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search tickets..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ maxWidth: "300px" }}
+            />
+
+            {role === "ADMIN" && status === "OPEN" && (
+              <button
+                className="btn btn-primary fw-bold shadow-sm"
+                onClick={() => {
+                  api
+                    .put("/admin/tickets/auto-assign")
+                    .then(() => {
+                      toast.success("Tickets assigned successfully");
+                      window.location.reload();
+                    })
+                    .catch(() => toast.error("Failed to assign tickets"));
+                }}
+              >
+                ⚡ Auto Assign
+              </button>
+            )}
+          </div>
         </div>
 
         {loading && <p>Loading tickets...</p>}
@@ -94,22 +119,31 @@ function TicketListByStatus() {
               </tr>
             </thead>
             <tbody>
-              {tickets.map((t, index) => (
-                <tr
-                  key={t.id}
-                  onClick={() => navigate(`/tickets/${t.id}`)}
-                  style={{ cursor: "pointer" }}
-                >
-                  <td>{index + 1}</td>
-                  <td>{t.title}</td>
-                  <td>
-                    <StatusBadge status={t.status} />
-                  </td>
-                  <td>
-                    <PriorityBadge priority={t.priority} />
-                  </td>
-                </tr>
-              ))}
+              {tickets
+                .filter(
+                  (t) =>
+                    t.title.toLowerCase().includes(search.toLowerCase()) ||
+                    t.description
+                      .toLowerCase()
+                      .includes(search.toLowerCase()) ||
+                    t.priority.toLowerCase().includes(search.toLowerCase()),
+                )
+                .map((t, index) => (
+                  <tr
+                    key={t.id}
+                    onClick={() => navigate(`/tickets/${t.id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <td>{index + 1}</td>
+                    <td>{t.title}</td>
+                    <td>
+                      <StatusBadge status={t.status} />
+                    </td>
+                    <td>
+                      <PriorityBadge priority={t.priority} />
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </ThemeTable>
         )}

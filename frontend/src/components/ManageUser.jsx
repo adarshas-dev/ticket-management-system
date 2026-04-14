@@ -8,6 +8,7 @@ import ThemeTable from "./ThemeTable";
 
 function ManageUsers() {
   const [users, setUsers] = useState([]);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -54,7 +55,25 @@ function ManageUsers() {
   return (
     <DashboardLayout>
       <div className="manage-users-page">
-        <h2 className="text-format">Manage Users</h2>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: "20px",
+          }}
+        >
+          <h2 className="text-format">Manage Users</h2>
+
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Search..."
+            style={{ maxWidth: "300px" }}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
 
         <ThemeTable>
           <thead>
@@ -67,26 +86,33 @@ function ManageUsers() {
           </thead>
 
           <tbody>
-            {users.map((user) => (
-              <tr
-                key={user.id}
-                onClick={() => navigate(`/users/${user.id}`)}
-                style={{ cursor: "pointer" }}
-              >
-                <td>{user.name}</td>
-                <td>{user.email}</td>
-                <td>{user.role}</td>
+            {users
+              .filter(
+                (user) =>
+                  user.name.toLowerCase().includes(search.toLowerCase()) ||
+                  user.email.toLowerCase().includes(search.toLowerCase()) ||
+                  user.role.toLowerCase().includes(search.toLowerCase()),
+              )
+              .map((user) => (
+                <tr
+                  key={user.id}
+                  onClick={() => navigate(`/users/${user.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.role}</td>
 
-                <td>
-                  <button
-                    className="btn btn-warning"
-                    onClick={(e) => toggleStatus(e, user)}
-                  >
-                    Suspend
-                  </button>
-                </td>
-              </tr>
-            ))}
+                  <td>
+                    <button
+                      className="btn btn-warning"
+                      onClick={(e) => toggleStatus(e, user)}
+                    >
+                      Suspend
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </ThemeTable>
       </div>

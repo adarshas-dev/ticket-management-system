@@ -108,7 +108,7 @@ function TicketDetails() {
                 // backgroundColor: "#e9ecef",
                 backgroundColor: getStatusColor(ticket.status),
                 fontWeight: "bold",
-                color: "white"
+                color: "white",
               }}
             >
               {formatStatus(ticket.status)}
@@ -141,8 +141,20 @@ function TicketDetails() {
           <div className="ticket-card">
             <h4>Description</h4>
             <p>{ticket.description}</p>
+            {ticket.attachment && (
+              <div>
+                <strong>Attachment:</strong>
+                <br />
+                <a
+                  href={`http://localhost:8080/uploads/${ticket.attachment}`}
+                  target="_blank"
+                >
+                  View File
+                </a>
+              </div>
+            )}
 
-            <hr />
+            <hr/>
 
             <p>
               <b>Created:</b> {new Date(ticket.createdAt).toLocaleString()}
@@ -202,7 +214,9 @@ function TicketDetails() {
         <div>
           <h3 className="text-format">Comments</h3>
 
-          {ticket.comments?.length === 0 && <p className="text-format">No comments yet</p>}
+          {ticket.comments?.length === 0 && (
+            <p className="text-format">No comments yet</p>
+          )}
 
           <div
             style={{ display: "flex", flexDirection: "column", gap: "10px" }}

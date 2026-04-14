@@ -106,16 +106,26 @@ function UserDetails() {
             </span>
 
             <span
-              style={{
-                padding: "6px 12px",
-                borderRadius: "20px",
-                backgroundColor: "#d1e7dd",
-                color: "black",
-              }}
-            >
-              <b>Email : </b>
-              {user.email}
-            </span>
+  style={{
+    padding: "6px 12px",
+    borderRadius: "20px",
+    backgroundColor: "#d1e7dd",
+    color: "black",
+  }}
+>
+  <b>Email : </b>
+  <a
+    href={`https://mail.google.com/mail/?view=cm&to=${user.email}`}
+    target="_blank"
+    style={{
+      color: "#0d6efd",
+      textDecoration: "none",
+      fontWeight: "500",
+    }}
+  >
+    {user.email}
+  </a>
+</span>
 
             <span
               style={{
@@ -180,13 +190,17 @@ function UserDetails() {
               className="report-card"
               onClick={() => navigate(`/tickets/${r.ticketId}`)}
             >
-              <div style={{ fontWeight: "bold" }} className="text-format">{r.reportedByName}</div>
+              <div style={{ fontWeight: "bold" }} className="text-format">
+                {r.reportedByName}
+              </div>
 
               <div style={{ fontSize: "13px", color: "gray" }}>
                 Ticket #{r.ticketId} • {new Date(r.createdAt).toLocaleString()}
               </div>
 
-              <div style={{ marginTop: "5px" }} className="text-format">{r.message}</div>
+              <div style={{ marginTop: "5px" }} className="text-format">
+                {r.message}
+              </div>
             </div>
           ))}
         </div>

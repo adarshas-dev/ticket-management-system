@@ -8,6 +8,7 @@ import ThemeTable from "./ThemeTable";
 
 function AdminReports() {
   const [reports, setReports] = useState([]);
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,7 +21,25 @@ function AdminReports() {
 
   return (
     <DashboardLayout>
-      <h2 className="text-format">Reports</h2>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          marginBottom: "20px",
+        }}
+      >
+        <h2 className="text-format">Reports</h2>
+
+        <input
+          type="text"
+          className="form-control"
+          placeholder="Search..."
+          style={{ maxWidth: "300px" }}
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+      </div>
 
       <ThemeTable>
         <thead>
@@ -36,54 +55,60 @@ function AdminReports() {
         </thead>
 
         <tbody>
-          {reports.map((r, index) => (
-            <tr key={r.id}>
-              <td>{index + 1}</td>
-              <td
-                style={{ cursor: "pointer", textDecoration: "underline" }}
-                className="text-format"
-                onClick={() => navigate(`/users/${r.userId}`)}
-              >
-                {r.reportedByName}
-              </td>
-              <td
-                style={{ cursor: "pointer", textDecoration: "underline" }}
-                className="text-format"
-                onClick={() => navigate(`/users/${r.agentId}`)}
-              >
-                {r.agentName}
-              </td>
-
-              <td
-                style={{ cursor: "pointer", textDecoration: "underline" }}
-                className="text-format"
-                onClick={() => navigate(`/tickets/${r.ticketId}`)}
-              >
-                #{r.ticketId}
-              </td>
-
-              <td>{r.message}</td>
-
-              <td>{new Date(r.createdAt).toLocaleString()}</td>
-
-              <td>
-                <button
-                  className="btn btn-sm btn-success"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    api
-                      .put(`/reports/${r.id}/resolve`)
-                      .then(() => {
-                        setReports(reports.filter((rep) => rep.id !== r.id));
-                      })
-                      .catch(() => toast.error("Failed to resolve"));
-                  }}
+          {reports
+            .filter(
+              (r) =>
+                r.agentName.toLowerCase().includes(search.toLowerCase()) ||
+                r.message.toLowerCase().includes(search.toLowerCase()),
+            )
+            .map((r, index) => (
+              <tr key={r.id}>
+                <td>{index + 1}</td>
+                <td
+                  style={{ cursor: "pointer", textDecoration: "underline" }}
+                  className="text-format"
+                  onClick={() => navigate(`/users/${r.userId}`)}
                 >
-                  Resolve
-                </button>
-              </td>
-            </tr>
-          ))}
+                  {r.reportedByName}
+                </td>
+                <td
+                  style={{ cursor: "pointer", textDecoration: "underline" }}
+                  className="text-format"
+                  onClick={() => navigate(`/users/${r.agentId}`)}
+                >
+                  {r.agentName}
+                </td>
+
+                <td
+                  style={{ cursor: "pointer", textDecoration: "underline" }}
+                  className="text-format"
+                  onClick={() => navigate(`/tickets/${r.ticketId}`)}
+                >
+                  #{r.ticketId}
+                </td>
+
+                <td>{r.message}</td>
+
+                <td>{new Date(r.createdAt).toLocaleString()}</td>
+
+                <td>
+                  <button
+                    className="btn btn-sm btn-success"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      api
+                        .put(`/reports/${r.id}/resolve`)
+                        .then(() => {
+                          setReports(reports.filter((rep) => rep.id !== r.id));
+                        })
+                        .catch(() => toast.error("Failed to resolve"));
+                    }}
+                  >
+                    Resolve
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </ThemeTable>
     </DashboardLayout>

@@ -7,7 +7,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 
@@ -26,8 +28,14 @@ public class TicketController {
     //create ticket
     @PreAuthorize("hasRole('USER')")
     @PostMapping("/create")
-    public Ticket createTicket(@RequestBody Ticket ticket){
-        return ticketService.createTicket( ticket);
+    public Ticket createTicket(
+            @RequestParam String title,
+            @RequestParam String description,
+            @RequestParam(required = false) Priority priority,
+            @RequestParam(required = false) MultipartFile file
+    ) throws IOException {
+
+        return ticketService.createTicket(title, description, priority, file);
     }
 
     //view own ticket
@@ -36,6 +44,13 @@ public class TicketController {
     public List<Ticket> getUserTickets(){
 
         return ticketService.getTicketsForLoggedInUser();
+    }
+
+    @GetMapping("/my/status/{status}")
+    public List<Ticket> getMyTicketsByStatus(
+            @PathVariable TicketStatus status
+    ) {
+        return ticketService.getMyTicketsByStatus(status);
     }
 
     @GetMapping("/{id}")
@@ -71,7 +86,7 @@ public class TicketController {
     }
 
     //get the tickets according to the status
-    @PreAuthorize("hasAnyRole('ADMIN','AGENT')")
+    @PreAuthorize("hasAnyRole('ADMIN','AGENT', 'USER')")
     @GetMapping("/status/{status}")
     public List<Ticket> getTicketsByStatus(@PathVariable TicketStatus status) {
 

@@ -7,7 +7,13 @@ import com.example.ticketing.repository.TicketRepository;
 import com.example.ticketing.repository.UserRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,16 +29,73 @@ public class TicketService {
     }
 
     //create ticket
-    public Ticket createTicket(Ticket ticket){
-        User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    public Ticket createTicket(
+            String title,
+            String description,
+            Priority priority,
+            MultipartFile file
+    ) throws IOException {
+
+        User user = (User) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        Ticket ticket = new Ticket();
+
+        ticket.setTitle(title);
+        ticket.setDescription(description);
 
         ticket.setCreatedAt(LocalDateTime.now());
         ticket.setCreatedBy(user);
         ticket.setStatus(TicketStatus.OPEN);
-        if (ticket.getPriority() == null) {
+
+        if (priority == null) {
             ticket.setPriority(Priority.MEDIUM);
+        } else {
+            ticket.setPriority(priority);
         }
+
         ticket.setSeenByAgent(false);
+
+        // file upload
+        if (file != null && !file.isEmpty()) {
+
+            // size check (5MB)
+            if (file.getSize() > 5 * 1024 * 1024) {
+                throw new RuntimeException("File size must be under 5MB");
+            }
+
+            // type check
+            String contentType = file.getContentType();
+
+            if (!contentType.equals("image/png") &&
+                    !contentType.equals("image/jpeg") &&
+                    !contentType.equals("application/pdf")) {
+
+                throw new RuntimeException("Only PNG, JPEG and PDF allowed");
+            }
+
+            // sanitize filename
+            String original = file.getOriginalFilename()
+                    .replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
+
+            String fileName = System.currentTimeMillis() + "_" + original;
+
+            Path uploadPath = Paths.get(System.getProperty("user.dir"), "uploads");
+
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+            }
+
+            Files.copy(
+                    file.getInputStream(),
+                    uploadPath.resolve(fileName),
+                    StandardCopyOption.REPLACE_EXISTING
+            );
+
+            ticket.setAttachment(fileName);
+        }
 
         return ticketRepository.save(ticket);
     }
@@ -138,5 +201,16 @@ public class TicketService {
 
     public List<Ticket> getTicketsByStatusForAgent(TicketStatus status, User agent) {
         return ticketRepository.findByStatusAndAssignedAgent(status, agent);
+    }
+
+    public List<Ticket> getMyTicketsByStatus(TicketStatus status) {
+
+        User user = (User) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        return ticketRepository
+                .findByCreatedByAndStatus(user, status);
     }
 }

@@ -45,4 +45,6 @@ public class Ticket {
     private List<Comment> comments;
 
     private Boolean seenByAgent = false;
+
+    private String attachment;
 }
