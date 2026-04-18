@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
-import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../layout/DashboardLayout";
 import StatusBadge from "./StatusBadge";
@@ -21,36 +20,31 @@ function AgentDashboard() {
 
   const navigate = useNavigate();
 
+  // FILTER
   const filteredTickets = tickets.filter((t) => {
+    const q = search.toLowerCase();
+
     return (
-      t.title.toLowerCase().includes(search.toLocaleLowerCase()) &&
+      t.title?.toLowerCase().includes(q) &&
       (statusFilter ? t.status === statusFilter : true) &&
       (priorityFilter ? t.priority === priorityFilter : true)
     );
   });
 
-  const priorityOrder = {
-    URGENT: 0,
-    HIGH: 1,
-    MEDIUM: 2,
-    LOW: 3,
-  };
-  const statusOrder = {
-    OPEN: 0,
-    IN_PROGRESS: 1,
-    RESOLVED: 2,
-    CLOSED: 3,
-  };
+  // SORT
+  const priorityOrder = { URGENT: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
+  const statusOrder = { OPEN: 0, IN_PROGRESS: 1, RESOLVED: 2, CLOSED: 3 };
+
   const sortedTickets = [...filteredTickets].sort((a, b) => {
-    // STATUS FIRST
     const statusDiff =
       (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99);
     if (statusDiff !== 0) return statusDiff;
-    //PRIORITY SECOND
+
     const priorityDiff =
-      (priorityOrder[a.priority] ?? 99) - (priorityOrder[b.priority] ?? 99);
+      (priorityOrder[a.priority] ?? 99) -
+      (priorityOrder[b.priority] ?? 99);
     if (priorityDiff !== 0) return priorityDiff;
-    //DATE
+
     return new Date(a.createdAt) - new Date(b.createdAt);
   });
 
@@ -63,26 +57,24 @@ function AgentDashboard() {
           setError(
             err.response?.status === 403
               ? "Not authorized"
-              : "Failed to load tickets",
+              : "Failed to load tickets"
           );
         })
         .finally(() => setLoading(false));
 
       api.get("/dashboard/agent-stats").then((res) => setStats(res.data));
-
-      api
-        .get("/tickets/agent/priority-tickets")
-        .then((res) => setPriorityTickets(res.data));
-
-      api.get("/tickets/agent/unread-count").then((res) => setUnread(res.data));
+      api.get("/tickets/agent/priority-tickets").then((res) =>
+        setPriorityTickets(res.data)
+      );
+      api.get("/tickets/agent/unread-count").then((res) =>
+        setUnread(res.data)
+      );
     };
 
     fetchData();
 
-    // auto refresh every 5 sec
     const interval = setInterval(fetchData, 5000);
 
-    // mark seen
     setTimeout(() => {
       api.put("/tickets/agent/mark-seen");
     }, 1000);
@@ -90,63 +82,66 @@ function AgentDashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  if (loading) return <p>Loading assigned tickets...</p>;
-  if (error) return <p style={{ color: "red" }}>{error}</p>;
-
   return (
     <DashboardLayout>
-      {/* filter & search */}
-      <div
-        style={{
-          display: "flex",
-          gap: "10px",
-          marginBottom: "15px",
-          flexWrap: "wrap",
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Search tickets..."
-          className="form-control"
-          style={{ maxWidth: "250px" }}
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-
-        <select
-          className="form-select"
-          style={{ maxWidth: "180px" }}
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-        >
-          <option value="">All Status</option>
-          <option value="OPEN">Open</option>
-          <option value="IN_PROGRESS">In Progress</option>
-          <option value="RESOLVED">Resolved</option>
-          <option value="CLOSED">Closed</option>
-        </select>
-
-        <select
-          className="form-select"
-          style={{ maxWidth: "180px" }}
-          value={priorityFilter}
-          onChange={(e) => setPriorityFilter(e.target.value)}
-        >
-          <option value="">All Priority</option>
-          <option value="URGENT">Urgent</option>
-          <option value="HIGH">High</option>
-          <option value="MEDIUM">Medium</option>
-          <option value="LOW">Low</option>
-        </select>
-      </div>
-
-      {/* notification */}
       <div>
+
+        {/* 🔹 ERROR */}
+        {error && <p style={{ color: "red" }}>{error}</p>}
+
+        {/* 🔹 FILTER */}
+        <div
+          style={{
+            display: "flex",
+            gap: "10px",
+            marginBottom: "15px",
+            flexWrap: "wrap",
+          }}
+        >
+          <input
+            type="text"
+            placeholder="Search tickets..."
+            className="form-control"
+            style={{ maxWidth: "250px" }}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+
+          <select
+            className="form-select"
+            style={{ maxWidth: "180px" }}
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+          >
+            <option value="">All Status</option>
+            <option value="OPEN">Open</option>
+            <option value="IN_PROGRESS">In Progress</option>
+            <option value="RESOLVED">Resolved</option>
+            <option value="CLOSED">Closed</option>
+          </select>
+
+          <select
+            className="form-select"
+            style={{ maxWidth: "180px" }}
+            value={priorityFilter}
+            onChange={(e) => setPriorityFilter(e.target.value)}
+          >
+            <option value="">All Priority</option>
+            <option value="URGENT">Urgent</option>
+            <option value="HIGH">High</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="LOW">Low</option>
+          </select>
+        </div>
+
+        {/* 🔹 NOTIFICATION */}
         {unread > 0 && (
           <div className="alert alert-warning">
             🔔 {unread} new tickets assigned
           </div>
         )}
+
+        {/* 🔹 STATS */}
         {stats && (
           <div
             style={{
@@ -162,21 +157,18 @@ function AgentDashboard() {
               color="#fd7e14"
               onClick={() => navigate("/agent/tickets/OPEN")}
             />
-
             <StatCard
               title="In Progress"
               value={stats.inProgressTickets}
               color="#ffc107"
               onClick={() => navigate("/agent/tickets/IN_PROGRESS")}
             />
-
             <StatCard
               title="Resolved"
               value={stats.resolvedTickets}
               color="#198754"
               onClick={() => navigate("/agent/tickets/RESOLVED")}
             />
-
             <StatCard
               title="Closed"
               value={stats.closedTickets}
@@ -186,6 +178,7 @@ function AgentDashboard() {
           </div>
         )}
 
+        {/* 🔹 PRIORITY */}
         <div style={{ marginBottom: "25px" }}>
           <h4 className="text-format">🔥 Priority Tickets</h4>
 
@@ -195,14 +188,16 @@ function AgentDashboard() {
             priorityTickets.map((t) => (
               <div
                 key={t.id}
-                onClick={() => navigate(`/tickets/${t.id}`)}
+                onClick={() =>
+                  navigate(`/tickets/${t.id}`, { state: t })
+                }
                 style={{
                   padding: "12px",
                   marginBottom: "10px",
                   borderLeft:
                     t.priority === "URGENT"
                       ? "5px solid red"
-                      : "5px solid orange ",
+                      : "5px solid orange",
                   background: "#fff3f3",
                   borderRadius: "6px",
                   cursor: "pointer",
@@ -217,44 +212,49 @@ function AgentDashboard() {
           )}
         </div>
 
-        {tickets.length === 0 ? (
-          <p>No assigned tickets</p>
-        ) : (
-          <ThemeTable>
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Priority</th>
-                <th>Created At</th>
-              </tr>
-            </thead>
+        {/* 🔹 TABLE */}
+        <ThemeTable>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
 
-            <tbody>
-              {sortedTickets.map((t, index) => (
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan="5">Loading tickets...</td>
+              </tr>
+            ) : sortedTickets.length === 0 ? (
+              <tr>
+                <td colSpan="5">No assigned tickets</td>
+              </tr>
+            ) : (
+              sortedTickets.map((t, index) => (
                 <tr
                   key={t.id}
-                  onClick={() => navigate(`/tickets/${t.id}`)}
+                  onClick={() =>
+                    navigate(`/tickets/${t.id}`, { state: t })
+                  }
                   style={{ cursor: "pointer" }}
                 >
                   <td>{index + 1}</td>
                   <td>{t.title}</td>
-
+                  <td><StatusBadge status={t.status} /></td>
+                  <td><PriorityBadge priority={t.priority} /></td>
                   <td>
-                    <StatusBadge status={t.status} />
+                    {new Date(t.createdAt).toLocaleDateString()}
                   </td>
-
-                  <td>
-                    <PriorityBadge priority={t.priority} />
-                  </td>
-
-                  <td>{new Date(t.createdAt).toLocaleDateString()}</td>
                 </tr>
-              ))}
-            </tbody>
-          </ThemeTable>
-        )}
+              ))
+            )}
+          </tbody>
+        </ThemeTable>
+
       </div>
     </DashboardLayout>
   );

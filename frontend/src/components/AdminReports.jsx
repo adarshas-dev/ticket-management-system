@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import DashboardLayout from "../layout/DashboardLayout";
-import { Table } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ThemeTable from "./ThemeTable";
@@ -9,15 +8,30 @@ import ThemeTable from "./ThemeTable";
 function AdminReports() {
   const [reports, setReports] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
   const navigate = useNavigate();
 
   useEffect(() => {
     api
       .get("/reports")
       .then((res) => setReports(res.data))
-      .catch(() => toast.error("Failed to load reports"));
+      .catch(() => toast.error("Failed to load reports"))
+      .finally(() => setLoading(false));
+
     api.put("/reports/mark-read");
   }, []);
+
+  const filteredReports = reports.filter((r) => {
+    const q = search.toLowerCase();
+
+    return (
+      r.agentName?.toLowerCase().includes(q) ||
+      r.reportedByName?.toLowerCase().includes(q) ||
+      r.message?.toLowerCase().includes(q) ||
+      r.ticketId?.toString().includes(q)
+    );
+  });
 
   return (
     <DashboardLayout>
@@ -55,15 +69,19 @@ function AdminReports() {
         </thead>
 
         <tbody>
-          {reports
-            .filter(
-              (r) =>
-                r.agentName.toLowerCase().includes(search.toLowerCase()) ||
-                r.message.toLowerCase().includes(search.toLowerCase()),
-            )
-            .map((r, index) => (
+          {loading ? (
+            <tr>
+              <td colSpan="7">Loading reports...</td>
+            </tr>
+          ) : filteredReports.length === 0 ? (
+            <tr>
+              <td colSpan="7">No reports found</td>
+            </tr>
+          ) : (
+            filteredReports.map((r, index) => (
               <tr key={r.id}>
                 <td>{index + 1}</td>
+
                 <td
                   style={{ cursor: "pointer", textDecoration: "underline" }}
                   className="text-format"
@@ -71,6 +89,7 @@ function AdminReports() {
                 >
                   {r.reportedByName}
                 </td>
+
                 <td
                   style={{ cursor: "pointer", textDecoration: "underline" }}
                   className="text-format"
@@ -82,24 +101,33 @@ function AdminReports() {
                 <td
                   style={{ cursor: "pointer", textDecoration: "underline" }}
                   className="text-format"
-                  onClick={() => navigate(`/tickets/${r.ticketId}`)}
+                  onClick={() =>
+                    navigate(`/tickets/${r.ticketId}`, {
+                      state: { id: r.ticketId }, // minimal state
+                    })
+                  }
                 >
                   #{r.ticketId}
                 </td>
 
                 <td>{r.message}</td>
 
-                <td>{new Date(r.createdAt).toLocaleString()}</td>
+                <td>
+                  {new Date(r.createdAt).toLocaleString()}
+                </td>
 
                 <td>
                   <button
                     className="btn btn-sm btn-success"
                     onClick={(e) => {
                       e.stopPropagation();
+
                       api
                         .put(`/reports/${r.id}/resolve`)
                         .then(() => {
-                          setReports(reports.filter((rep) => rep.id !== r.id));
+                          setReports((prev) =>
+                            prev.filter((rep) => rep.id !== r.id)
+                          );
                         })
                         .catch(() => toast.error("Failed to resolve"));
                     }}
@@ -108,7 +136,8 @@ function AdminReports() {
                   </button>
                 </td>
               </tr>
-            ))}
+            ))
+          )}
         </tbody>
       </ThemeTable>
     </DashboardLayout>

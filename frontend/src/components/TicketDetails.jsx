@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Form, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import api from "../api/axios";
 import { useAuth } from "../auth/AuthContext";
 import DashboardLayout from "../layout/DashboardLayout";
@@ -8,14 +8,18 @@ import { toast } from "react-toastify";
 
 function TicketDetails() {
   const { id } = useParams();
-  const [ticket, setTicket] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const location = useLocation();
+
+  const [ticket, setTicket] = useState(location.state || null);
+  const [loading, setLoading] = useState(!location.state);
+
   const [comment, setComment] = useState("");
   const [showReportModal, setShowReportModal] = useState(false);
   const [reportText, setReportText] = useState("");
-  const { role, user } = useAuth();
+  const { role } = useAuth();
   const [agents, setAgents] = useState([]);
 
+  // fetch ticket
   useEffect(() => {
     api
       .get(`/tickets/${id}`)
@@ -23,6 +27,7 @@ function TicketDetails() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // fetch agents (admin)
   useEffect(() => {
     if (role === "ADMIN") {
       api.get("/admin/agents").then((res) => setAgents(res.data));
@@ -77,58 +82,58 @@ function TicketDetails() {
 
     try {
       await api.post("/reports", {
-        ticketId: ticket.id,
-        agentId: ticket.assignedAgent?.id,
+        ticketId: ticket?.id,
+        agentId: ticket?.assignedAgent?.id,
         message: reportText,
       });
 
       toast.success("Report submitted successfully");
-
       setReportText("");
       setShowReportModal(false);
-    } catch (err) {
+    } catch {
       toast.error("Failed to submit report");
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-  if (!ticket) return <p>Ticket not found</p>;
   return (
     <DashboardLayout>
       <div className="ticket-container">
         {/* HEADER */}
         <div style={{ marginBottom: "20px" }}>
-          <h2 className="text-format">{ticket.title}</h2>
+          <h2 className="text-format">
+            {ticket?.title || (
+              <span className="spinner-border spinner-border-sm text-primary"></span>
+            )}
+          </h2>
 
           <div style={{ display: "flex", gap: "15px", marginTop: "10px" }}>
             <span
               style={{
                 padding: "6px 12px",
                 borderRadius: "20px",
-                // backgroundColor: "#e9ecef",
-                backgroundColor: getStatusColor(ticket.status),
+                backgroundColor: getStatusColor(ticket?.status),
                 fontWeight: "bold",
                 color: "white",
               }}
             >
-              {formatStatus(ticket.status)}
+              {ticket ? formatStatus(ticket.status) : "Loading"}
             </span>
 
             <span
               style={{
                 padding: "6px 12px",
                 borderRadius: "20px",
-                backgroundColor: ticket.assignedAgent ? "#d1e7dd" : "#f8d7da",
+                backgroundColor: ticket?.assignedAgent ? "#d1e7dd" : "#f8d7da",
               }}
             >
-              {ticket.assignedAgent
+              {ticket?.assignedAgent
                 ? `Assigned to ${ticket.assignedAgent.name}`
                 : "Not Assigned"}
             </span>
           </div>
         </div>
 
-        {/* MAIN CONTENT GRID */}
+        {/* MAIN GRID */}
         <div
           style={{
             display: "grid",
@@ -137,34 +142,40 @@ function TicketDetails() {
             marginBottom: "30px",
           }}
         >
-          {/* LEFT SIDE - INFO */}
+          {/* LEFT */}
           <div className="ticket-card">
             <h4>Description</h4>
-            <p>{ticket.description}</p>
-            {ticket.attachment && (
+            <p>{ticket?.description || <span className="spinner-border spinner-border-sm text-primary"></span>}</p>
+
+            {ticket?.attachment && (
               <div>
                 <strong>Attachment:</strong>
                 <br />
                 <a
                   href={`http://localhost:8080/uploads/${ticket.attachment}`}
                   target="_blank"
+                  rel="noreferrer"
                 >
                   View File
                 </a>
               </div>
             )}
 
-            <hr/>
+            <hr />
 
             <p>
-              <b>Created:</b> {new Date(ticket.createdAt).toLocaleString()}
+              <b>Created:</b>{" "}
+              {ticket? (
+                new Date(ticket.createdAt).toLocaleString()
+              ) : (
+                <span className="spinner-border spinner-border-sm text-primary"></span>
+              )}
             </p>
           </div>
 
-          {/* RIGHT SIDE - ACTIONS */}
+          {/* RIGHT */}
           <div className="ticket-card">
-            {/* Agent Update Status */}
-            {role === "AGENT" && (
+            {role === "AGENT" && ticket && (
               <>
                 <h5>Update Status</h5>
                 <select
@@ -186,7 +197,6 @@ function TicketDetails() {
               </>
             )}
 
-            {/* Admin Assign */}
             {role === "ADMIN" && (
               <>
                 <h5 style={{ marginTop: "20px" }}>Assign Agent</h5>
@@ -194,7 +204,7 @@ function TicketDetails() {
                   style={{ width: "100%", padding: "8px" }}
                   onChange={(e) => {
                     api
-                      .put(`/tickets/${ticket.id}/assign/${e.target.value}`)
+                      .put(`/tickets/${ticket?.id}/assign/${e.target.value}`)
                       .then((res) => setTicket(res.data));
                   }}
                 >
@@ -210,18 +220,18 @@ function TicketDetails() {
           </div>
         </div>
 
-        {/* COMMENTS SECTION */}
+        {/* COMMENTS */}
         <div>
           <h3 className="text-format">Comments</h3>
 
-          {ticket.comments?.length === 0 && (
+          {!loading && ticket?.comments?.length === 0 && (
             <p className="text-format">No comments yet</p>
           )}
 
           <div
             style={{ display: "flex", flexDirection: "column", gap: "10px" }}
           >
-            {ticket.comments?.map((c) => (
+            {ticket?.comments?.map((c) => (
               <div key={c.id} className="comment-card">
                 <b>{c.user?.name}</b>
                 <p style={{ margin: "5px 0 0 0" }}>{c.message}</p>
@@ -229,9 +239,8 @@ function TicketDetails() {
             ))}
           </div>
 
-          {/* Add Comment */}
           {(role === "AGENT" || role === "USER") &&
-            ticket.status !== "CLOSED" && (
+            ticket?.status !== "CLOSED" && (
               <div style={{ marginTop: "20px" }}>
                 <textarea
                   value={comment}
@@ -243,19 +252,17 @@ function TicketDetails() {
                     borderRadius: "8px",
                   }}
                 />
+
                 <div
                   style={{ display: "flex", justifyContent: "space-between" }}
                 >
-                  <button
-                    className="btn btn-primary mt-2 px-3 py-2 rounded border-0"
-                    onClick={addComment}
-                  >
+                  <button className="btn btn-primary mt-2" onClick={addComment}>
                     Add Comment
                   </button>
 
                   {role === "USER" && (
                     <button
-                      className="btn btn-danger mt-2 px-3 py-2 rounded border-0"
+                      className="btn btn-danger mt-2"
                       onClick={() => setShowReportModal(true)}
                     >
                       Report
@@ -266,11 +273,11 @@ function TicketDetails() {
             )}
         </div>
 
+        {/* MODAL */}
         <Modal
           show={showReportModal}
           onHide={() => setShowReportModal(false)}
           centered
-          contentClassName="report-modal"
         >
           <div style={{ padding: "20px" }}>
             <h4 className="text-format">Report Agent</h4>
@@ -301,4 +308,5 @@ function TicketDetails() {
     </DashboardLayout>
   );
 }
+
 export default TicketDetails;

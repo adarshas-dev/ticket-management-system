@@ -155,15 +155,27 @@ public class TicketService {
         return ticketRepository.findByAssignedAgentAndStatus(agent, status);
     }
 
+    //user stats
     public UserStatsDto getUserStats(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
+        // ✅ AGENT → assigned tickets
+        if (user.getRole().name().equals("AGENT")) {
+            return new UserStatsDto(
+                    ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.OPEN),
+                    ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.IN_PROGRESS),
+                    ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.RESOLVED),
+                    ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.CLOSED)
+            );
+        }
+
+        // ✅ USER → created tickets
         return new UserStatsDto(
-                ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.OPEN),
-                ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.IN_PROGRESS),
-                ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.RESOLVED),
-                ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.CLOSED)
+                ticketRepository.countByCreatedByAndStatus(user, TicketStatus.OPEN),
+                ticketRepository.countByCreatedByAndStatus(user, TicketStatus.IN_PROGRESS),
+                ticketRepository.countByCreatedByAndStatus(user, TicketStatus.RESOLVED),
+                ticketRepository.countByCreatedByAndStatus(user, TicketStatus.CLOSED)
         );
     }
 
@@ -212,5 +224,12 @@ public class TicketService {
 
         return ticketRepository
                 .findByCreatedByAndStatus(user, status);
+    }
+
+    public List<Ticket> getTicketsByUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+
+        return ticketRepository.findByCreatedByOrderByCreatedAtDesc(user);
     }
 }

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { login } from "../auth/authService";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
@@ -10,6 +10,13 @@ function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { loginSuccess } = useAuth();
+
+  useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    navigate("/", { replace: true });
+  }
+}, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

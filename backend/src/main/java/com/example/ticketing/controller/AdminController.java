@@ -78,7 +78,7 @@ public class AdminController {
         return userRepository.save(user);
     }
 
-    //admin manages user(admin and agent)
+    //admin manages user
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users/active")
     public List<UserResponseDto> getActiveUsers() {
@@ -100,7 +100,7 @@ public class AdminController {
                 .toList();
     }
 
-    //admin manages user(admin and agent)
+    //admin inactive users
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/users/inactive")
     public List<UserResponseDto> getInactiveUsers() {
@@ -138,27 +138,27 @@ public class AdminController {
         return ticketService.getUserStats(id);
     }
 
-    //admin can delete user(admin/agent)
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/users/{id}")
-    public void deleteUser(@PathVariable Long id,
-                           Authentication authentication) {
-
-        User currentAdmin = (User) authentication.getPrincipal();
-
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (user.getId().equals(currentAdmin.getId())) {
-            throw new RuntimeException("You cannot delete yourself");
-        }
-
-        if (user.getRole() == Role.USER) {
-            throw new RuntimeException("Cannot delete normal users here");
-        }
-
-        userRepository.delete(user);
-    }
+//    //admin can delete user(admin/agent)
+//    @PreAuthorize("hasRole('ADMIN')")
+//    @DeleteMapping("/users/{id}")
+//    public void deleteUser(@PathVariable Long id,
+//                           Authentication authentication) {
+//
+//        User currentAdmin = (User) authentication.getPrincipal();
+//
+//        User user = userRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("User not found"));
+//
+//        if (user.getId().equals(currentAdmin.getId())) {
+//            throw new RuntimeException("You cannot delete yourself");
+//        }
+//
+//        if (user.getRole() == Role.USER) {
+//            throw new RuntimeException("Cannot delete normal users here");
+//        }
+//
+//        userRepository.delete(user);
+//    }
 
     //admin can suspend or activate the user
     @PutMapping("/users/{id}/toggle-status")
@@ -254,6 +254,13 @@ public class AdminController {
     public String autoAssignTickets() {
         ticketService.autoAssignTickets();
         return "Tickets assigned successfully";
+    }
+
+    //admin can see user tickets
+    @GetMapping("/users/{id}/tickets")
+    @PreAuthorize("hasRole('ADMIN')")
+    public List<Ticket> getUserTickets(@PathVariable Long id) {
+        return ticketService.getTicketsByUser(id);
     }
 
 }

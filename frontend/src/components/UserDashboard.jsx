@@ -38,12 +38,12 @@ function UserDashboard() {
     api.get("/dashboard/customer-stats").then((res) => setStats(res.data));
   }, []);
 
-  if (loading) return <p>Loading tickets...</p>;
   if (error) return <p style={{ color: "red" }}>{error}</p>;
   console.log("TICKETS DATA:", tickets);
   return (
     <DashboardLayout>
       <div>
+        {/* Cards */}
         <div
           style={{
             display: "grid",
@@ -55,7 +55,7 @@ function UserDashboard() {
           <StatCard
             title="Total Tickets"
             value={stats.total}
-            color="#fd7e14"
+            color="#0d6efd"
             onClick={() => navigate("/user/tickets/ALL")}
           />
           <StatCard
@@ -64,21 +64,18 @@ function UserDashboard() {
             color="#fd7e14"
             onClick={() => navigate("/user/tickets/OPEN")}
           />
-
           <StatCard
             title="In Progress"
             value={stats.inProgress}
             color="#ffc107"
             onClick={() => navigate("/user/tickets/IN_PROGRESS")}
           />
-
           <StatCard
             title="Resolved"
             value={stats.resolved}
             color="#198754"
             onClick={() => navigate("/user/tickets/RESOLVED")}
           />
-
           <StatCard
             title="Closed"
             value={stats.closed}
@@ -87,6 +84,7 @@ function UserDashboard() {
           />
         </div>
 
+        {/* Header */}
         <div
           style={{
             display: "flex",
@@ -107,21 +105,33 @@ function UserDashboard() {
           />
         </div>
 
-        {tickets.length === 0 ? (
-          <p>No tickets found</p>
-        ) : (
-          <ThemeTable>
-            <thead>
+        {/* Table */}
+        <ThemeTable>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Status</th>
+              <th>Priority</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {loading ? (
               <tr>
-                <th>ID</th>
-                <th>Title</th>
-                <th>Status</th>
-                <th>Priority</th>
-                <th>Created At</th>
+                <td colSpan="5">
+                  <div className="text-center">
+                    <div className="spinner-border text-primary"></div>
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {tickets
+            ) : tickets.length === 0 ? (
+              <tr>
+                <td colSpan="5">No tickets found</td>
+              </tr>
+            ) : (
+              tickets
                 .filter((t) => {
                   const q = search.toLowerCase();
 
@@ -134,7 +144,7 @@ function UserDashboard() {
                 .map((t) => (
                   <tr
                     key={t.id}
-                    onClick={() => navigate(`/tickets/${t.id}`)}
+                    onClick={() => navigate(`/tickets/${t.id}`, { state: t })}
                     style={{ cursor: "pointer" }}
                   >
                     <td>{t.id}</td>
@@ -147,10 +157,10 @@ function UserDashboard() {
                     </td>
                     <td>{new Date(t.createdAt).toLocaleDateString()}</td>
                   </tr>
-                ))}
-            </tbody>
-          </ThemeTable>
-        )}
+                ))
+            )}
+          </tbody>
+        </ThemeTable>
       </div>
     </DashboardLayout>
   );

@@ -101,7 +101,12 @@ function TicketListByStatus() {
           </div>
         </div>
 
-        {loading && <p>Loading tickets...</p>}
+        {loading && (
+          <div className="text-center">
+            <div className="spinner-border text-primary"></div>
+          </div>
+        )}
+        
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         {!loading && !error && tickets.length === 0 && (
@@ -120,14 +125,15 @@ function TicketListByStatus() {
             </thead>
             <tbody>
               {tickets
-                .filter(
-                  (t) =>
-                    t.title.toLowerCase().includes(search.toLowerCase()) ||
-                    t.description
-                      .toLowerCase()
-                      .includes(search.toLowerCase()) ||
-                    t.priority.toLowerCase().includes(search.toLowerCase()),
-                )
+                .filter((t) => {
+                  const q = search.toLowerCase();
+
+                  return (
+                    t.title?.toLowerCase().includes(q) ||
+                    t.status?.toLowerCase().includes(q) ||
+                    t.priority?.toLowerCase().includes(q)
+                  );
+                })
                 .map((t, index) => (
                   <tr
                     key={t.id}

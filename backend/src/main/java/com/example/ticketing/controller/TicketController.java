@@ -100,7 +100,7 @@ public class TicketController {
         return ticketService.getTicketsByStatusForAgent(status, user);
     }
 
-    //gets assigned tickets for the agent in the sidebar
+//    gets assigned tickets for the agent in the sidebar
     @PreAuthorize("hasRole('AGENT')")
     @GetMapping("/assigned/status/{status}")
     public List<Ticket> getAssignedTicketsByStatus(
@@ -111,6 +111,7 @@ public class TicketController {
         return ticketService.getAssignedTicketsByStatus(agent.getEmail(), status);
     }
 
+    //agent priority ticket
     @GetMapping("/agent/priority-tickets")
     @PreAuthorize("hasRole('AGENT')")
     public List<Ticket> getPriorityTickets() {
@@ -147,5 +148,7 @@ public class TicketController {
         tickets.forEach(t -> t.setSeenByAgent(true));
         ticketRepository.saveAll(tickets);
     }
+
+
 
 }

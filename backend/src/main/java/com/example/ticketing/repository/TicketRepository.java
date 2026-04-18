@@ -49,4 +49,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
             User user,
             TicketStatus status
     );
+
+    List<Ticket> findByCreatedByOrderByCreatedAtDesc(User user);
 }

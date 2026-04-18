@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 import { useEffect, useState } from "react";
 import api from "../api/axios";
@@ -12,6 +12,8 @@ function DashboardLayout({ children }) {
   const [unreadCount, setUnreadCount] = useState(0);
   const { role, name } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const token = localStorage.getItem("token");
 
   // dark mode
   const [dark, setDark] = useState(localStorage.getItem("dark") === "true");
@@ -38,6 +40,10 @@ function DashboardLayout({ children }) {
   }, [role]);
 
   const sidebarWidth = collapsed ? "80px" : "260px";
+
+//   if ("token") {
+//   return <Navigate to="/login" replace />;
+// }
 
   return (
     <div style={{ display: "flex", height: "100vh", overflow: "hidden" }}>
@@ -190,9 +196,11 @@ function DashboardLayout({ children }) {
       >
         <div className="top-header">
           <div style={{ display: "flex", alignItems: "center" }}>
-            <Button className="me-2 btn-pink" onClick={() => navigate(-1)}>
-              <i className="fa-solid fa-left-long"></i>
-            </Button>
+            {location.pathname !== "/" && (
+              <Button className="me-2 btn-pink" onClick={() => navigate(-1)}>
+                <i className="fa-solid fa-left-long"></i>
+              </Button>
+            )}
             {role === "ADMIN" && (
               <h5 className="dashboard-name">Admin Dashboard</h5>
             )}
