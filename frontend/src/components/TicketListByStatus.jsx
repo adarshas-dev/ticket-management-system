@@ -17,6 +17,8 @@ function TicketListByStatus() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const[page, setPage] = useState(0);
+  const pageSize = 10;
 
   useEffect(() => {
     setLoading(true);
@@ -47,6 +49,16 @@ function TicketListByStatus() {
       })
       .finally(() => setLoading(false));
   }, [status, role]);
+
+
+  const filteredTickets = [...tickets].sort(
+    (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
+  );
+  const totalPages = Math.ceil(filteredTickets.length / pageSize);
+  const paginatedTickets = filteredTickets.slice(
+    page * pageSize,
+    page * pageSize + pageSize,
+  );
 
   return (
     <DashboardLayout>
@@ -106,7 +118,7 @@ function TicketListByStatus() {
             <div className="spinner-border text-primary"></div>
           </div>
         )}
-        
+
         {error && <p style={{ color: "red" }}>{error}</p>}
 
         {!loading && !error && tickets.length === 0 && (
@@ -124,7 +136,7 @@ function TicketListByStatus() {
               </tr>
             </thead>
             <tbody>
-              {tickets
+              {paginatedTickets
                 .filter((t) => {
                   const q = search.toLowerCase();
 
@@ -152,6 +164,62 @@ function TicketListByStatus() {
                 ))}
             </tbody>
           </ThemeTable>
+        )}
+
+        {/* PAGINATION */}
+        {!loading && totalPages > 1 && (
+          <div
+            className="pagination d-flex justify-content-center align-items-center mt-3"
+            
+          >
+            {/* Prev */}
+            <button
+              className="btn"
+              disabled={page === 0}
+              onClick={() => setPage(page - 1)}
+              style={{
+                backgroundColor: page === 0 ? "#444" : "#0d6efd",
+                color: "white",
+                border: "none",
+                padding: "4px 10px",
+                fontSize: "13px",
+                borderRadius: "6px",
+                cursor: page === 0 ? "not-allowed" : "pointer",
+              }}
+            >
+              ⬅Prev
+            </button>
+
+            {/* Page Info */}
+            <span
+              className="text-format"
+              style={{
+                fontSize: "13px",
+                minWidth: "80px",
+                textAlign: "center",
+              }}
+            >
+              {page + 1} / {totalPages}
+            </span>
+
+            {/* Next */}
+            <button
+              className="btn"
+              disabled={page === totalPages - 1}
+              onClick={() => setPage(page + 1)}
+              style={{
+                backgroundColor: page === totalPages - 1 ? "#444" : "#0d6efd",
+                color: "white",
+                border: "none",
+                padding: "4px 10px",
+                fontSize: "13px",
+                borderRadius: "6px",
+                cursor: page === totalPages - 1 ? "not-allowed" : "pointer",
+              }}
+            >
+              Next➡
+            </button>
+          </div>
         )}
       </div>
     </DashboardLayout>

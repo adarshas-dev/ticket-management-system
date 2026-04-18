@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import api from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import { Button, Table } from "react-bootstrap";
 import DashboardLayout from "../layout/DashboardLayout";
 import StatusBadge from "./StatusBadge";
 import PriorityBadge from "./PriorityBadge";
@@ -10,17 +9,22 @@ import StatCard from "./StatCard";
 
 function UserDashboard() {
   const [tickets, setTickets] = useState([]);
+  const [filteredTickets, setFilteredTickets] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [stats, setStats] = useState({});
+  const [page, setPage] = useState(0);
+  const pageSize = 10;
+
   const navigate = useNavigate();
 
+  // FETCH DATA
   useEffect(() => {
     api
       .get("/tickets/my")
       .then((res) => {
-        setTickets(res.data);
+        setTickets(res.data || []);
       })
       .catch((err) => {
         setError(
@@ -34,16 +38,43 @@ function UserDashboard() {
       });
   }, []);
 
+  // STATS
   useEffect(() => {
     api.get("/dashboard/customer-stats").then((res) => setStats(res.data));
   }, []);
 
+  // FILTER + SEARCH
+  useEffect(() => {
+    const filtered = [...tickets]
+  .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // 🔥 NEW
+  .filter((t) => {
+    const q = (search || "").toLowerCase();
+
+    return (
+      (t.title || "").toLowerCase().includes(q) ||
+      (t.status || "").replace("_", " ").toLowerCase().includes(q) ||
+      (t.priority || "").toLowerCase().includes(q)
+    );
+  });
+
+    setFilteredTickets(filtered);
+    setPage(0); // reset page on search
+  }, [search, tickets]);
+
+  // PAGINATION LOGIC
+  const totalPages = Math.ceil(filteredTickets.length / pageSize);
+
+  const paginatedTickets = filteredTickets.slice(
+    page * pageSize,
+    page * pageSize + pageSize,
+  );
+
   if (error) return <p style={{ color: "red" }}>{error}</p>;
-  console.log("TICKETS DATA:", tickets);
+
   return (
     <DashboardLayout>
       <div>
-        {/* Cards */}
+        {/* CARDS */}
         <div
           style={{
             display: "grid",
@@ -84,7 +115,7 @@ function UserDashboard() {
           />
         </div>
 
-        {/* Header */}
+        {/* HEADER */}
         <div
           style={{
             display: "flex",
@@ -105,7 +136,7 @@ function UserDashboard() {
           />
         </div>
 
-        {/* Table */}
+        {/* TABLE */}
         <ThemeTable>
           <thead>
             <tr>
@@ -126,43 +157,90 @@ function UserDashboard() {
                   </div>
                 </td>
               </tr>
-            ) : tickets.length === 0 ? (
+            ) : paginatedTickets.length === 0 ? (
               <tr>
                 <td colSpan="5">No tickets found</td>
               </tr>
             ) : (
-              tickets
-                .filter((t) => {
-                  const q = search.toLowerCase();
-
-                  return (
-                    t.title?.toLowerCase().includes(q) ||
-                    t.status?.replace("_", " ").toLowerCase().includes(q) ||
-                    t.priority?.toLowerCase().includes(q)
-                  );
-                })
-                .map((t) => (
-                  <tr
-                    key={t.id}
-                    onClick={() => navigate(`/tickets/${t.id}`, { state: t })}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <td>{t.id}</td>
-                    <td>{t.title}</td>
-                    <td>
-                      <StatusBadge status={t.status} />
-                    </td>
-                    <td>
-                      <PriorityBadge priority={t.priority} />
-                    </td>
-                    <td>{new Date(t.createdAt).toLocaleDateString()}</td>
-                  </tr>
-                ))
+              paginatedTickets.map((t) => (
+                <tr
+                  key={t.id}
+                  onClick={() => navigate(`/tickets/${t.id}`, { state: t })}
+                  style={{ cursor: "pointer" }}
+                >
+                  <td>{t.id}</td>
+                  <td>{t.title}</td>
+                  <td>
+                    <StatusBadge status={t.status} />
+                  </td>
+                  <td>
+                    <PriorityBadge priority={t.priority} />
+                  </td>
+                  <td>{new Date(t.createdAt).toLocaleDateString()}</td>
+                </tr>
+              ))
             )}
           </tbody>
         </ThemeTable>
+
+        {/* PAGINATION */}
+        {!loading && totalPages > 1 && (
+          <div
+            className="pagination d-flex justify-content-center align-items-center mt-3"
+            
+          >
+            {/* Prev */}
+            <button
+              className="btn"
+              disabled={page === 0}
+              onClick={() => setPage(page - 1)}
+              style={{
+                backgroundColor: page === 0 ? "#444" : "#0d6efd",
+                color: "white",
+                border: "none",
+                padding: "4px 10px",
+                fontSize: "13px",
+                borderRadius: "6px",
+                cursor: page === 0 ? "not-allowed" : "pointer",
+              }}
+            >
+              ⬅Prev
+            </button>
+
+            {/* Page Info */}
+            <span
+              className="text-format"
+              style={{
+                fontSize: "13px",
+                minWidth: "80px",
+                textAlign: "center",
+              }}
+            >
+              {page + 1} / {totalPages}
+            </span>
+
+            {/* Next */}
+            <button
+              className="btn"
+              disabled={page === totalPages - 1}
+              onClick={() => setPage(page + 1)}
+              style={{
+                backgroundColor: page === totalPages - 1 ? "#444" : "#0d6efd",
+                color: "white",
+                border: "none",
+                padding: "4px 10px",
+                fontSize: "13px",
+                borderRadius: "6px",
+                cursor: page === totalPages - 1 ? "not-allowed" : "pointer",
+              }}
+            >
+              Next➡
+            </button>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );
 }
+
 export default UserDashboard;

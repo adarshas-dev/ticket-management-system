@@ -5,6 +5,10 @@ import com.example.ticketing.exception.ResourceNotFoundException;
 import com.example.ticketing.model.*;
 import com.example.ticketing.repository.TicketRepository;
 import com.example.ticketing.repository.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -231,5 +235,11 @@ public class TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return ticketRepository.findByCreatedByOrderByCreatedAtDesc(user);
+    }
+
+    //pagination
+    public Page<Ticket> getTickets(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return ticketRepository.findAll(pageable);
     }
 }

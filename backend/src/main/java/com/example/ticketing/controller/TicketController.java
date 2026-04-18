@@ -3,6 +3,7 @@ package com.example.ticketing.controller;
 import com.example.ticketing.model.*;
 import com.example.ticketing.repository.TicketRepository;
 import com.example.ticketing.service.TicketService;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -147,6 +148,15 @@ public class TicketController {
         List<Ticket> tickets = ticketRepository.findByAssignedAgentAndSeenByAgentFalse(agent);
         tickets.forEach(t -> t.setSeenByAgent(true));
         ticketRepository.saveAll(tickets);
+    }
+
+    //pagination
+    @GetMapping("/tickets")
+    public Page<Ticket> getTickets(
+            @RequestParam int page,
+            @RequestParam int size
+    ) {
+        return ticketService.getTickets(page, size);
     }
 
 

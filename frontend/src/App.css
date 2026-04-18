@@ -1,4 +1,5 @@
-html, body {
+html,
+body {
   background: #f8f9fa;
 }
 
@@ -263,7 +264,6 @@ body.dark {
   cursor: pointer;
 }
 
-
 /* ========================================
    LOGIN
 ======================================== */
@@ -280,6 +280,20 @@ body.dark {
   background: rgba(255, 255, 255, 0.9);
 }
 
+.pagination {
+  gap: 10px;
+  background: #cfd0d2;
+  padding: 6px 12px;
+  border-radius: 10px;
+  width: fit-content;
+  margin: 15px auto;
+  position: fixed;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+}
+
 /* =====================================================
    ==================== DARK MODE =======================
 ===================================================== */
@@ -289,7 +303,7 @@ body.dark .report-modal {
   background-color: #181717;
 }
 
-body.dark .report-card{
+body.dark .report-card {
   background: rgb(5, 5, 5);
 }
 
@@ -476,4 +490,9 @@ body.dark .btn-close {
 
 body.dark .modal-backdrop.show {
   opacity: 0.8;
+}
+
+/* pagination dark */
+body.dark .pagination{
+  background: #1e1e2f;
 }

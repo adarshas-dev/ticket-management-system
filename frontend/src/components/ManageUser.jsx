@@ -10,6 +10,9 @@ function ManageUsers() {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
+  const [page, setPage] = useState(0);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const pageSize = 10;
 
   useEffect(() => {
     fetchActiveUsers();
@@ -29,28 +32,46 @@ function ManageUsers() {
         const confirmAction = window.confirm(
           "This agent may have active tickets.\n\nAuto-assign them to other agents?",
         );
-
         if (!confirmAction) {
           return;
         }
-
         autoAssign = true;
       }
-
       await api.put(`/admin/users/${user.id}/toggle-status`, {
         autoAssign,
       });
-
       toast.success(`${user.name} suspended successfully`);
 
       //remove from active table immediately
       setUsers(users.filter((u) => u.id !== user.id));
     } catch (err) {
       const message = err.response?.data?.message || "Something went wrong";
-
       toast.info(message);
     }
   };
+
+  //filter
+  useEffect(() => {
+    const q = (search || "").toLowerCase();
+    const filtered = [...users]
+      .sort((a, b) => b.id - a.id) // latest users first
+      .filter((u) => {
+        return (
+          (u.name || "").toLowerCase().includes(q) ||
+          (u.email || "").toLowerCase().includes(q) ||
+          (u.role || "").toLowerCase().includes(q)
+        );
+      });
+    setFilteredUsers(filtered);
+    setPage(0); // 🔥 reset page on search
+  }, [users, search]);
+
+  //pagination logic
+  const totalPages = Math.ceil(filteredUsers.length / pageSize);
+  const paginatedUsers = filteredUsers.slice(
+    page * pageSize,
+    page * pageSize + pageSize,
+  );
 
   return (
     <DashboardLayout>
@@ -86,14 +107,12 @@ function ManageUsers() {
           </thead>
 
           <tbody>
-            {users
-              .filter(
-                (user) =>
-                  user.name.toLowerCase().includes(search.toLowerCase()) ||
-                  user.email.toLowerCase().includes(search.toLowerCase()) ||
-                  user.role.toLowerCase().includes(search.toLowerCase()),
-              )
-              .map((user) => (
+            {paginatedUsers.length === 0 ? (
+              <tr>
+                <td colSpan="4">No users found</td>
+              </tr>
+            ) : (
+              paginatedUsers.map((user) => (
                 <tr
                   key={user.id}
                   onClick={() => navigate(`/users/${user.id}`)}
@@ -112,9 +131,63 @@ function ManageUsers() {
                     </button>
                   </td>
                 </tr>
-              ))}
+              ))
+            )}
           </tbody>
         </ThemeTable>
+
+        {/* PAGINATION */}
+        {totalPages > 1 && (
+          <div className="pagination d-flex justify-content-center align-items-center mt-3">
+            {/* Prev */}
+            <button
+              className="btn"
+              disabled={page === 0}
+              onClick={() => setPage(page - 1)}
+              style={{
+                backgroundColor: page === 0 ? "#444" : "#0d6efd",
+                color: "white",
+                border: "none",
+                padding: "4px 10px",
+                fontSize: "13px",
+                borderRadius: "6px",
+                cursor: page === 0 ? "not-allowed" : "pointer",
+              }}
+            >
+              ⬅Prev
+            </button>
+
+            {/* Page Info */}
+            <span
+              className="text-format"
+              style={{
+                fontSize: "13px",
+                minWidth: "80px",
+                textAlign: "center",
+              }}
+            >
+              {page + 1} / {totalPages}
+            </span>
+
+            {/* Next */}
+            <button
+              className="btn"
+              disabled={page === totalPages - 1}
+              onClick={() => setPage(page + 1)}
+              style={{
+                backgroundColor: page === totalPages - 1 ? "#444" : "#0d6efd",
+                color: "white",
+                border: "none",
+                padding: "4px 10px",
+                fontSize: "13px",
+                borderRadius: "6px",
+                cursor: page === totalPages - 1 ? "not-allowed" : "pointer",
+              }}
+            >
+              Next➡
+            </button>
+          </div>
+        )}
       </div>
     </DashboardLayout>
   );

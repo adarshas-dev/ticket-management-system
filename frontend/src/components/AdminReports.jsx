@@ -9,6 +9,9 @@ function AdminReports() {
   const [reports, setReports] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [filteredReports, setFilteredReports] = useState([]);
+  const pageSize = 10;
 
   const navigate = useNavigate();
 
@@ -22,16 +25,43 @@ function AdminReports() {
     api.put("/reports/mark-read");
   }, []);
 
-  const filteredReports = reports.filter((r) => {
-    const q = search.toLowerCase();
+  // const filteredReports = reports.filter((r) => {
+  //   const q = search.toLowerCase();
 
-    return (
-      r.agentName?.toLowerCase().includes(q) ||
-      r.reportedByName?.toLowerCase().includes(q) ||
-      r.message?.toLowerCase().includes(q) ||
-      r.ticketId?.toString().includes(q)
-    );
-  });
+  //   return (
+  //     r.agentName?.toLowerCase().includes(q) ||
+  //     r.reportedByName?.toLowerCase().includes(q) ||
+  //     r.message?.toLowerCase().includes(q) ||
+  //     r.ticketId?.toString().includes(q)
+  //   );
+  // });
+
+  //filter
+  useEffect(() => {
+    const q = (search || "").toLowerCase();
+    const filtered = [...reports]
+      .sort((a, b) => b.id - a.id)
+      .filter((u) => {
+        return (
+          (u.agentName || "").toLowerCase().includes(q) ||
+          (u.reportedByName || "").toLowerCase().includes(q) ||
+          (u.message || "")
+            .toLowerCase()
+            .includes(q)(u.ticketId || "")
+            .toLowerCase()
+            .includes(q)
+        );
+      });
+    setFilteredReports(filtered);
+    setPage(0);
+  }, [reports, search]);
+
+  //pagination logic
+  const totalPages = Math.ceil(filteredReports.length / pageSize);
+  const paginatedReports = filteredReports.slice(
+    page * pageSize,
+    page * pageSize + pageSize,
+  );
 
   return (
     <DashboardLayout>
@@ -73,12 +103,12 @@ function AdminReports() {
             <tr>
               <td colSpan="7">Loading reports...</td>
             </tr>
-          ) : filteredReports.length === 0 ? (
+          ) : paginatedReports.length === 0 ? (
             <tr>
               <td colSpan="7">No reports found</td>
             </tr>
           ) : (
-            filteredReports.map((r, index) => (
+            paginatedReports.map((r, index) => (
               <tr key={r.id}>
                 <td>{index + 1}</td>
 
@@ -112,9 +142,7 @@ function AdminReports() {
 
                 <td>{r.message}</td>
 
-                <td>
-                  {new Date(r.createdAt).toLocaleString()}
-                </td>
+                <td>{new Date(r.createdAt).toLocaleString()}</td>
 
                 <td>
                   <button
@@ -126,7 +154,7 @@ function AdminReports() {
                         .put(`/reports/${r.id}/resolve`)
                         .then(() => {
                           setReports((prev) =>
-                            prev.filter((rep) => rep.id !== r.id)
+                            prev.filter((rep) => rep.id !== r.id),
                           );
                         })
                         .catch(() => toast.error("Failed to resolve"));
@@ -140,6 +168,59 @@ function AdminReports() {
           )}
         </tbody>
       </ThemeTable>
+
+      {/* PAGINATION */}
+      {totalPages > 1 && (
+        <div className="pagination d-flex justify-content-center align-items-center mt-3">
+          {/* Prev */}
+          <button
+            className="btn"
+            disabled={page === 0}
+            onClick={() => setPage(page - 1)}
+            style={{
+              backgroundColor: page === 0 ? "#444" : "#0d6efd",
+              color: "white",
+              border: "none",
+              padding: "4px 10px",
+              fontSize: "13px",
+              borderRadius: "6px",
+              cursor: page === 0 ? "not-allowed" : "pointer",
+            }}
+          >
+            ⬅Prev
+          </button>
+
+          {/* Page Info */}
+          <span
+            className="text-format"
+            style={{
+              fontSize: "13px",
+              minWidth: "80px",
+              textAlign: "center",
+            }}
+          >
+            {page + 1} / {totalPages}
+          </span>
+
+          {/* Next */}
+          <button
+            className="btn"
+            disabled={page === totalPages - 1}
+            onClick={() => setPage(page + 1)}
+            style={{
+              backgroundColor: page === totalPages - 1 ? "#444" : "#0d6efd",
+              color: "white",
+              border: "none",
+              padding: "4px 10px",
+              fontSize: "13px",
+              borderRadius: "6px",
+              cursor: page === totalPages - 1 ? "not-allowed" : "pointer",
+            }}
+          >
+            Next➡
+          </button>
+        </div>
+      )}
     </DashboardLayout>
   );
 }
