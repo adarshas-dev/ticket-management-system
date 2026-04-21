@@ -140,6 +140,7 @@ public class TicketController {
     }
 
     @PutMapping("/agent/mark-seen")
+    @PreAuthorize("hasRole('AGENT')")
     public void markSeen(){
         User agent = (User) SecurityContextHolder
                 .getContext()

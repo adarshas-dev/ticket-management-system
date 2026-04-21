@@ -5,6 +5,7 @@ import com.example.ticketing.dto.LoginRequest;
 import com.example.ticketing.dto.RegisterRequest;
 import com.example.ticketing.model.User;
 import com.example.ticketing.service.AuthService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,7 +23,7 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public User register(@RequestBody RegisterRequest request){
+    public User register(@Valid @RequestBody RegisterRequest request){
         return authService.register(request);
     }
 
