@@ -23,12 +23,16 @@ function NewAdminAgent() {
         password,
         role,
       });
-
+      toast.success("User created.");
       navigate("/");
     } catch (err) {
-      console.error(err);
-      toast.error("Failed to create user");
-    }
+  const msg =
+    err.response?.data?.message ||
+    err.response?.data ||
+    "Failed to create user";
+
+  toast.error(msg);
+}
   };
 
   return (
@@ -69,7 +73,7 @@ function NewAdminAgent() {
             </div>
 
             {/* Password */}
-            <div className="mb-4">
+            {/* <div className="mb-4">
               <label className="form-label fw-bold">Password</label>
               <div className="input-group">
                 <input
@@ -92,7 +96,7 @@ function NewAdminAgent() {
                   )}
                 </button>
               </div>
-            </div>
+            </div> */}
 
             {/* User Type */}
             <div className="mb-4">

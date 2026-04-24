@@ -29,7 +29,7 @@ function UserDashboard() {
       .catch((err) => {
         setError(
           err.response?.status === 403
-            ? "Not authorized"
+            ? "Failed to load data"
             : "Failed to load tickets",
         );
       })
@@ -162,13 +162,13 @@ function UserDashboard() {
                 <td colSpan="5">No tickets found</td>
               </tr>
             ) : (
-              paginatedTickets.map((t) => (
+              paginatedTickets.map((t, index) => (
                 <tr
                   key={t.id}
                   onClick={() => navigate(`/tickets/${t.id}`, { state: t })}
                   style={{ cursor: "pointer" }}
                 >
-                  <td>{t.id}</td>
+                  <td>{index + 1}</td>
                   <td>{t.title}</td>
                   <td>
                     <StatusBadge status={t.status} />

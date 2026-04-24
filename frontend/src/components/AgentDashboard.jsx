@@ -56,7 +56,7 @@ function AgentDashboard() {
         .catch((err) => {
           setError(
             err.response?.status === 403
-              ? "Not authorized"
+              ? "Failed to load data"
               : "Failed to load tickets"
           );
         })

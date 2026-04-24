@@ -12,6 +12,7 @@ import com.example.ticketing.model.TicketStatus;
 import com.example.ticketing.model.User;
 import com.example.ticketing.repository.TicketRepository;
 import com.example.ticketing.repository.UserRepository;
+import com.example.ticketing.security.MailService;
 import com.example.ticketing.service.TicketService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin")
@@ -33,13 +35,15 @@ public class AdminController {
     private final PasswordEncoder passwordEncoder;
     private final TicketService ticketService;
     private final TicketRepository ticketRepository;
+    private final MailService mailService;
 
 
-    public AdminController(UserRepository userRepository, PasswordEncoder passwordEncoder, TicketService ticketService, TicketRepository ticketRepository) {
+    public AdminController(UserRepository userRepository, PasswordEncoder passwordEncoder, TicketService ticketService, TicketRepository ticketRepository, MailService mailService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.ticketService = ticketService;
         this.ticketRepository = ticketRepository;
+        this.mailService = mailService;
     }
 
     //get agent details
@@ -56,6 +60,27 @@ public class AdminController {
     }
 
     //create new admin or agent
+//    @PostMapping("/create-user")
+//    public User createUser(@RequestBody NewAdminAgentDto request) {
+//
+//        if (request.getRole() == null)
+//            throw new RuntimeException("Role is required");
+//
+//        if (userRepository.findByEmail(request.getEmail()).isPresent())
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
+//
+//        if (request.getRole() == Role.USER)
+//            throw new RuntimeException("Cannot create USER here");
+//
+//        User user = new User();
+//        user.setName(request.getName());
+//        user.setEmail(request.getEmail());
+//        user.setPassword(passwordEncoder.encode(request.getPassword()));
+//        user.setRole(request.getRole());
+//
+//
+//        return userRepository.save(user);
+//    }
     @PostMapping("/create-user")
     public User createUser(@RequestBody NewAdminAgentDto request) {
 
@@ -68,14 +93,27 @@ public class AdminController {
         if (request.getRole() == Role.USER)
             throw new RuntimeException("Cannot create USER here");
 
+        String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setPassword(passwordEncoder.encode(tempPassword));
         user.setRole(request.getRole());
 
+        User savedUser = userRepository.save(user);
 
-        return userRepository.save(user);
+        mailService.sendEmail(
+                user.getEmail(),
+                "Your account has been created",
+                "Hello " + user.getName() + ",\n\n" +
+                        "Your account has been created.\n" +
+                        "Email: " + user.getEmail() + "\n" +
+                        "Temporary Password: " + tempPassword + "\n\n" +
+                        "Please login and change your password."
+        );
+
+        return savedUser;
     }
 
     //admin manages user

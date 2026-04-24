@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -38,6 +39,14 @@ public class GlobalExceptionHandler {
 //                new ApiError(500, "Internal server error"),
                 new ApiError(500, ex.getMessage()),
                 HttpStatus.INTERNAL_SERVER_ERROR
+        );
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiError> handleResponseStatus(ResponseStatusException ex) {
+        return new ResponseEntity<>(
+                new ApiError(ex.getStatusCode().value(), ex.getReason()),
+                HttpStatus.valueOf(ex.getStatusCode().value())
         );
     }
 
