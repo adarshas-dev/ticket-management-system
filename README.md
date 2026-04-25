@@ -4,6 +4,17 @@ A full-stack role-based service request management system built using Spring Boo
 
 ---
 
+## 🚀 Live Demo
+
+Frontend: https://ticket-management-system-tawny.vercel.app  
+Backend: https://ticket-management-system-3jgy.onrender.com  
+
+## 📂 GitHub Repository
+
+https://github.com/adarshas-dev/ticket-management-system
+
+---
+
 ## 🧩 Features
 
 - 🔐 JWT Authentication
