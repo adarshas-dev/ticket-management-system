@@ -53,7 +53,7 @@ public class SecurityConfig {
 
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:5173",
-                "https://ticket-management-system.vercel.app"
+                "https://ticket-management-system-tawny.vercel.app"
         ));
 
         configuration.setAllowedMethods(List.of(
