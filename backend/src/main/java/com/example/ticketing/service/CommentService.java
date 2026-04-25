@@ -54,8 +54,8 @@ public class CommentService {
     }
 
     //view comments
-    public List<Comment> getComments(Long ticketId){
-        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(()->new ResourceNotFoundException("Ticket not found"));
+    public List<Comment> getComments(Long ticketId) {
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
 
         return commentRepository.findByTicketOrderByCreatedAtAsc(ticket);
     }

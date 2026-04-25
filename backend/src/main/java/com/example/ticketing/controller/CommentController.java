@@ -21,14 +21,14 @@ public class CommentController {
     //add comment
     @PreAuthorize("hasAnyRole('USER','AGENT')")
     @PostMapping("/ticket/{ticketId}")
-    public Comment addComment(@PathVariable Long ticketId, @RequestBody Map<String, String> body){
+    public Comment addComment(@PathVariable Long ticketId, @RequestBody Map<String, String> body) {
         return commentService.addComment(ticketId, body.get("message"));
     }
 
     //view comment
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/ticket/{ticketId}")
-    public List<Comment> getComments(@PathVariable Long ticketId){
+    public List<Comment> getComments(@PathVariable Long ticketId) {
         return commentService.getComments(ticketId);
     }
 

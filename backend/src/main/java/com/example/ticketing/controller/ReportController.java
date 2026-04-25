@@ -73,8 +73,8 @@ public class ReportController {
     @PutMapping("/mark-read")
     @PreAuthorize("hasRole('ADMIN')")
     public void martReportAsRead() {
-        List <Report> reports = reportRepository.findByReadFalseAndResolvedFalse();
-        for(Report r : reports){
+        List<Report> reports = reportRepository.findByReadFalseAndResolvedFalse();
+        for (Report r : reports) {
             r.setRead(true);
         }
         reportRepository.saveAll(reports);
@@ -83,8 +83,8 @@ public class ReportController {
     //resolved reports
     @PutMapping("/{id}/resolve")
     @PreAuthorize("hasRole('ADMIN')")
-    public void resolveReport(@PathVariable Long id){
-        Report report = reportRepository.findById(id).orElseThrow(()-> new RuntimeException("Report not found"));
+    public void resolveReport(@PathVariable Long id) {
+        Report report = reportRepository.findById(id).orElseThrow(() -> new RuntimeException("Report not found"));
         report.setResolved(true);
         reportRepository.save(report);
     }

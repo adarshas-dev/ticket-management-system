@@ -17,7 +17,7 @@ function TicketListByStatus() {
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
   const navigate = useNavigate();
-  const[page, setPage] = useState(0);
+  const [page, setPage] = useState(0);
   const pageSize = 10;
 
   useEffect(() => {
@@ -49,7 +49,6 @@ function TicketListByStatus() {
       })
       .finally(() => setLoading(false));
   }, [status, role]);
-
 
   const filteredTickets = [...tickets].sort(
     (a, b) => new Date(b.createdAt) - new Date(a.createdAt),
@@ -98,13 +97,17 @@ function TicketListByStatus() {
               <button
                 className="btn btn-primary fw-bold shadow-sm"
                 onClick={() => {
-                  api
-                    .put("/admin/tickets/auto-assign")
-                    .then(() => {
+                  api.put("/admin/tickets/auto-assign").then((res) => {
+                    if (res.data === "No tickets to assign") {
+                      toast.info("No tickets to assign");
+                    } else {
                       toast.success("Tickets assigned successfully");
-                      window.location.reload();
-                    })
-                    .catch(() => toast.error("Failed to assign tickets"));
+
+                      setTimeout(() => {
+                        window.location.reload();
+                      }, 1500);
+                    }
+                  });
                 }}
               >
                 ⚡ Auto Assign
@@ -168,10 +171,7 @@ function TicketListByStatus() {
 
         {/* PAGINATION */}
         {!loading && totalPages > 1 && (
-          <div
-            className="pagination d-flex justify-content-center align-items-center mt-3"
-            
-          >
+          <div className="pagination d-flex justify-content-center align-items-center mt-3">
             {/* Prev */}
             <button
               className="btn"

@@ -11,8 +11,10 @@ import java.util.List;
 
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByCreatedBy(User user);
+
     List<Ticket> findByAssignedAgent(User agent);
-//    List<Ticket> findByStatus(TicketStatus status);
+
+    //    List<Ticket> findByStatus(TicketStatus status);
     long countByStatus(TicketStatus status);
 
     List<Ticket> findByStatus(TicketStatus status);
@@ -24,6 +26,7 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByAssignedAgentIsNull();
 
     List<Ticket> findByAssignedAgentIsNullAndStatus(TicketStatus status);
+
     List<Ticket> findTop3ByAssignedAgentAndPriorityInAndStatusInOrderByCreatedAtAsc(
             User agent,
             List<Priority> priorities,

@@ -12,11 +12,10 @@ import com.example.ticketing.model.TicketStatus;
 import com.example.ticketing.model.User;
 import com.example.ticketing.repository.TicketRepository;
 import com.example.ticketing.repository.UserRepository;
-import com.example.ticketing.security.MailService;
+import com.example.ticketing.service.MailService;
 import com.example.ticketing.service.TicketService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -60,27 +59,6 @@ public class AdminController {
     }
 
     //create new admin or agent
-//    @PostMapping("/create-user")
-//    public User createUser(@RequestBody NewAdminAgentDto request) {
-//
-//        if (request.getRole() == null)
-//            throw new RuntimeException("Role is required");
-//
-//        if (userRepository.findByEmail(request.getEmail()).isPresent())
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists");
-//
-//        if (request.getRole() == Role.USER)
-//            throw new RuntimeException("Cannot create USER here");
-//
-//        User user = new User();
-//        user.setName(request.getName());
-//        user.setEmail(request.getEmail());
-//        user.setPassword(passwordEncoder.encode(request.getPassword()));
-//        user.setRole(request.getRole());
-//
-//
-//        return userRepository.save(user);
-//    }
     @PostMapping("/create-user")
     public User createUser(@RequestBody NewAdminAgentDto request) {
 
@@ -286,11 +264,14 @@ public class AdminController {
         );
     }
 
-    //auto assign ticket to agents
     @PutMapping("/tickets/auto-assign")
     @PreAuthorize("hasRole('ADMIN')")
     public String autoAssignTickets() {
-        ticketService.autoAssignTickets();
+        int count = ticketService.autoAssignTickets();
+
+        if (count == 0) {
+            return "No tickets to assign";
+        }
         return "Tickets assigned successfully";
     }
 

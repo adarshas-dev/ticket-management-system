@@ -10,7 +10,11 @@ A full-stack role-based service request management system built using Spring Boo
 - 👥 Role-based access (ADMIN, AGENT, USER)
 - 🎫 Create and manage tickets
 - 📊 Dashboard with ticket statistics
-- 🛠 Ticket assignment to agents
+- 📧 Email notifications for new users(Admin/Agent)
+- ⚡ Auto-assign open tickets to agents
+- 🔍 Search and pagination
+- 🛡 Password validation and secure login
+- 🚨 Report agents to admin
 - 💬 Comment system for discussion
 - 🔄 Ticket lifecycle:
   - OPEN
@@ -54,11 +58,13 @@ A full-stack role-based service request management system built using Spring Boo
 
 ## 📌 Status
 
-Core features completed.  
-UI enhancements and additional improvements ongoing.
+✅ Completed and ready for deployment
 
 ---
 ## 📸 Screenshots
+
+### Register
+![Register](screenshots/register.png)
 
 ### Login Page
 ![Login](screenshots/login.png)
@@ -66,14 +72,50 @@ UI enhancements and additional improvements ongoing.
 ### Admin Dashboard
 ![Admin Dashboard](screenshots/admin-dashboard.png)
 
+### Admin Dashboard Sidebar
+![Admin Dashboard Sidebar](screenshots/admin-dashboard-sidebar.png)
+
+### Admin Auto Assign Tickets
+![Admin Auto Assign Tickets](screenshots/admin-auto-assign-tickets.png)
+
+### Admin Assign Ticket
+![Admin Assign Ticket](screenshots/admin-assign-ticket.png)
+
+### Admin Create Admin/Agent
+![Create Admin/Agent](screenshots/admin-create-user.png)
+
+### Admin User Details
+![User Details](screenshots/admin-user-details.png)
+
+### Admin Reports
+![Reports](screenshots/admin-reports.png)
+
+### Agent Dashboard
+![Agent Dashboard](screenshots/agent-dashboard.png)
+
 ### Ticket Details
 ![Ticket Details](screenshots/ticket-details.png)
 
 ### Manage Users
-![Manage Users](screenshots/admin-manage-user.png)
+![Manage Users](screenshots/admin-manage-users.png)
+
+### Inactive Users
+![Inactive Users](screenshots/admin-inactive-users.png)
+
+### New Password
+![Create New Password](screenshots/new-password.png)
+
+### Report Agent
+![User Reports Agent](screenshots/user-report-agent.png)
+
+### User Dashboard
+![User Dashboard](screenshots/user-dashboard.png)
 
 ### Create Ticket
 ![Create Ticket](screenshots/user-create-ticket.png)
+
+
+
 
 
 ## 👨‍💻 Author

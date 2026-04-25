@@ -1,4 +1,4 @@
-package com.example.ticketing.security;
+package com.example.ticketing.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
@@ -14,14 +14,14 @@ public class MailService {
 
     @Async
     public void sendEmail(String to, String subject, String text) {
-        try{
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom("adarshasokakumar0@gmail.com");
-        message.setTo(to);
-        message.setSubject(subject);
-        message.setText(text);
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setFrom("adarshasokakumar0@gmail.com");
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(text);
 
-        mailSender.send(message);
+            mailSender.send(message);
         } catch (Exception e) {
             System.out.println("Email failed: " + e.getMessage());
         }

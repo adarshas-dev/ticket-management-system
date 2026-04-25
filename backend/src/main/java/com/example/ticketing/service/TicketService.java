@@ -105,19 +105,19 @@ public class TicketService {
     }
 
     //view ticket
-    public List<Ticket> getTicketsForLoggedInUser(){
+    public List<Ticket> getTicketsForLoggedInUser() {
         User user = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
         return ticketRepository.findByCreatedBy(user);
     }
 
     //assign ticket to agent
-    public Ticket assignTicket(Long ticketId, Long agentId){
-        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(()->new ResourceNotFoundException("Ticket not found"));
+    public Ticket assignTicket(Long ticketId, Long agentId) {
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
 
-        User agent = userRepository.findById(agentId).orElseThrow(()->new ResourceNotFoundException("Agent not found"));
+        User agent = userRepository.findById(agentId).orElseThrow(() -> new ResourceNotFoundException("Agent not found"));
 
-        if(agent.getRole() != Role.AGENT){
+        if (agent.getRole() != Role.AGENT) {
             throw new RuntimeException("User is not an agent");
         }
 
@@ -128,15 +128,15 @@ public class TicketService {
     }
 
     //view assigned tickets
-    public List<Ticket> getTicketsForAgent(String email){
-        User agnet = userRepository.findByEmail(email).orElseThrow(()->new ResourceNotFoundException("Agent not found"));
+    public List<Ticket> getTicketsForAgent(String email) {
+        User agnet = userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Agent not found"));
 
         return ticketRepository.findByAssignedAgent(agnet);
     }
 
     //update status
-    public Ticket updateStatus(Long ticketId, TicketStatus status){
-        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(()->new ResourceNotFoundException("Ticket not found"));
+    public Ticket updateStatus(Long ticketId, TicketStatus status) {
+        Ticket ticket = ticketRepository.findById(ticketId).orElseThrow(() -> new ResourceNotFoundException("Ticket not found"));
 
         ticket.setStatus(status);
         return ticketRepository.save(ticket);
@@ -144,7 +144,7 @@ public class TicketService {
 
 
     public Ticket getTicketById(Long id) {
-        return ticketRepository.findById(id).orElseThrow(()-> new RuntimeException("Ticket not found"));
+        return ticketRepository.findById(id).orElseThrow(() -> new RuntimeException("Ticket not found"));
     }
 
     public List<Ticket> getTicketsByStatus(TicketStatus status) {
@@ -164,7 +164,7 @@ public class TicketService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        // ✅ AGENT → assigned tickets
+        //assigned tickets
         if (user.getRole().name().equals("AGENT")) {
             return new UserStatsDto(
                     ticketRepository.countByAssignedAgentAndStatus(user, TicketStatus.OPEN),
@@ -174,7 +174,7 @@ public class TicketService {
             );
         }
 
-        // ✅ USER → created tickets
+        //created tickets
         return new UserStatsDto(
                 ticketRepository.countByCreatedByAndStatus(user, TicketStatus.OPEN),
                 ticketRepository.countByCreatedByAndStatus(user, TicketStatus.IN_PROGRESS),
@@ -183,8 +183,7 @@ public class TicketService {
         );
     }
 
-    public void autoAssignTickets() {
-
+    public int autoAssignTickets() {
         //get all agents
 //        List<User> agents = userRepository.findByRole(Role.AGENT);
         List<User> agents = userRepository.findByRoleAndActiveTrue(Role.AGENT);
@@ -192,9 +191,11 @@ public class TicketService {
         if (agents.isEmpty()) {
             throw new RuntimeException("No agents available");
         }
-
         //get all unassigned tickets
         List<Ticket> tickets = ticketRepository.findByAssignedAgentIsNullAndStatus(TicketStatus.OPEN);
+        if (tickets.isEmpty()) {
+            return 0;
+        }
 
         //sort based on priority
         tickets.sort((t1, t2) -> t2.getPriority().compareTo(t1.getPriority()));
@@ -211,8 +212,8 @@ public class TicketService {
 
             index++;
         }
-
         ticketRepository.saveAll(tickets);
+        return tickets.size();
     }
 
     public List<Ticket> getTicketsByStatusForAgent(TicketStatus status, User agent) {

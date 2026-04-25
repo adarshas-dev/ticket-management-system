@@ -15,14 +15,14 @@ import java.util.Map;
 @Service
 public class DashboardService {
     private final TicketRepository ticketRepository;
-    private  final UserRepository userRepository;
+    private final UserRepository userRepository;
 
     public DashboardService(TicketRepository ticketRepository, UserRepository userRepository) {
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
     }
 
-    public DashboardStatsResponse getStats(){
+    public DashboardStatsResponse getStats() {
         long total = ticketRepository.count();
         long open = ticketRepository.countByStatus(TicketStatus.OPEN);
         long inProgress = ticketRepository.countByStatus(TicketStatus.IN_PROGRESS);
@@ -30,40 +30,40 @@ public class DashboardService {
         long closed = ticketRepository.countByStatus(TicketStatus.CLOSED);
 
         return new DashboardStatsResponse(
-                total,open,inProgress,resolved,closed
+                total, open, inProgress, resolved, closed
         );
     }
 
 
-        public Map<String, Long> getStatsForAgent(String email) {
+    public Map<String, Long> getStatsForAgent(String email) {
 
-            User agent = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("Agent not found"));
+        User agent = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Agent not found"));
 
-            List<Ticket> tickets = ticketRepository.findByAssignedAgent(agent);
+        List<Ticket> tickets = ticketRepository.findByAssignedAgent(agent);
 
-            long open = tickets.stream()
-                    .filter(t -> t.getStatus() == TicketStatus.OPEN)
-                    .count();
+        long open = tickets.stream()
+                .filter(t -> t.getStatus() == TicketStatus.OPEN)
+                .count();
 
-            long inProgress = tickets.stream()
-                    .filter(t -> t.getStatus() == TicketStatus.IN_PROGRESS)
-                    .count();
+        long inProgress = tickets.stream()
+                .filter(t -> t.getStatus() == TicketStatus.IN_PROGRESS)
+                .count();
 
-            long resolved = tickets.stream()
-                    .filter(t -> t.getStatus() == TicketStatus.RESOLVED)
-                    .count();
+        long resolved = tickets.stream()
+                .filter(t -> t.getStatus() == TicketStatus.RESOLVED)
+                .count();
 
-            long closed = tickets.stream()
-                    .filter(t -> t.getStatus() == TicketStatus.CLOSED)
-                    .count();
+        long closed = tickets.stream()
+                .filter(t -> t.getStatus() == TicketStatus.CLOSED)
+                .count();
 
-            Map<String, Long> stats = new HashMap<>();
-            stats.put("openTickets", open);
-            stats.put("inProgressTickets", inProgress);
-            stats.put("resolvedTickets", resolved);
-            stats.put("closedTickets", closed);
+        Map<String, Long> stats = new HashMap<>();
+        stats.put("openTickets", open);
+        stats.put("inProgressTickets", inProgress);
+        stats.put("resolvedTickets", resolved);
+        stats.put("closedTickets", closed);
 
-            return stats;
-        }
+        return stats;
     }
+}

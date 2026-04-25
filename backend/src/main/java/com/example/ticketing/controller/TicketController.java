@@ -42,7 +42,7 @@ public class TicketController {
     //view own ticket
     @PreAuthorize("hasRole('USER')")
     @GetMapping("/my")
-    public List<Ticket> getUserTickets(){
+    public List<Ticket> getUserTickets() {
 
         return ticketService.getTicketsForLoggedInUser();
     }
@@ -55,14 +55,14 @@ public class TicketController {
     }
 
     @GetMapping("/{id}")
-    public Ticket getTicketById(@PathVariable Long id){
+    public Ticket getTicketById(@PathVariable Long id) {
         return ticketService.getTicketById(id);
     }
 
     //assign ticket
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{ticketId}/assign/{agentId}")
-    public Ticket assignTicket(@PathVariable Long ticketId, @PathVariable Long agentId){
+    public Ticket assignTicket(@PathVariable Long ticketId, @PathVariable Long agentId) {
         return ticketService.assignTicket(ticketId, agentId);
     }
 
@@ -82,7 +82,7 @@ public class TicketController {
     //update status
     @PreAuthorize("hasRole('AGENT')")
     @PutMapping("/{ticketId}/status")
-    public Ticket updateStatus(@PathVariable Long ticketId, @RequestParam TicketStatus status){
+    public Ticket updateStatus(@PathVariable Long ticketId, @RequestParam TicketStatus status) {
         return ticketService.updateStatus(ticketId, status);
     }
 
@@ -101,7 +101,7 @@ public class TicketController {
         return ticketService.getTicketsByStatusForAgent(status, user);
     }
 
-//    gets assigned tickets for the agent in the sidebar
+    //    gets assigned tickets for the agent in the sidebar
     @PreAuthorize("hasRole('AGENT')")
     @GetMapping("/assigned/status/{status}")
     public List<Ticket> getAssignedTicketsByStatus(
@@ -130,7 +130,7 @@ public class TicketController {
     //agent notification
     @GetMapping("/agent/unread-count")
     @PreAuthorize("hasRole('AGENT')")
-    public long unreadTickets(){
+    public long unreadTickets() {
         User agent = (User) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
@@ -141,7 +141,7 @@ public class TicketController {
 
     @PutMapping("/agent/mark-seen")
     @PreAuthorize("hasRole('AGENT')")
-    public void markSeen(){
+    public void markSeen() {
         User agent = (User) SecurityContextHolder
                 .getContext()
                 .getAuthentication()
@@ -159,7 +159,6 @@ public class TicketController {
     ) {
         return ticketService.getTickets(page, size);
     }
-
 
 
 }

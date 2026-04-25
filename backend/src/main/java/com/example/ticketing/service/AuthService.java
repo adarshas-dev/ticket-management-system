@@ -25,8 +25,8 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    public User register(RegisterRequest request){
-        if(userRepository.findByEmail(request.getEmail()).isPresent()){
+    public User register(RegisterRequest request) {
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new BadRequestException("Email already exists");
         }
 
@@ -39,7 +39,7 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    public AuthResponse login(LoginRequest request){
+    public AuthResponse login(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BadRequestException("Invalid email"));
