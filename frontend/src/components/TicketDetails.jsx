@@ -152,12 +152,12 @@ function TicketDetails() {
                 <strong>Attachment:</strong>
                 <br />
                 <a
-                  href={`http://localhost:8080/uploads/${ticket.attachment}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  View File
-                </a>
+  href={`https://ticket-management-system-3jgy.onrender.com/uploads/${ticket.attachment}`}
+  target="_blank"
+  rel="noreferrer"
+>
+  View File
+</a>
               </div>
             )}
 
